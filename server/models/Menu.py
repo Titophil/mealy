@@ -10,4 +10,4 @@ class Menu(db.Model):
     menu_date=db.Column(db.Date,nullable=False)
 
 
-    items= db.relationship('MenuItem', back_populates='menu',lazy= True)
+    items= db.relationship('MenuItem', back_populates='menu',cascade='all, delete-orphan')

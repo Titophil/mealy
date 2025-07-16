@@ -22,6 +22,10 @@ def create_app():
     # from routes.auth import auth_bp
     # app.register_blueprint(auth_bp, url_prefix='/auth')
 
+    from routes.Menu import menu_bp
+    app.register_blueprint(menu_bp)
+
+
     return app
 
 app = create_app()

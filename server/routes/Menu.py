@@ -1,13 +1,14 @@
-from app import db
+from extensions import db
 from flask import Blueprint,request,jsonify
-from models import Menu,MenuItem
+from models.Menu import Menu
+from models.Menu_item import MenuItem
 from datetime import datetime
 
 
 menu_bp = Blueprint('menu_bp', __name__)
 
 
-@menu_bp.route('/menus', methods=['POST'])
+@menu_bp.route('', methods=['POST'])
 def create_menu():
     data = request.get_json()
 
@@ -43,4 +44,42 @@ def create_menu():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500   
 
+
+
+
+@menu_bp.route('', methods=['GET'])
+def get_all_menus():
+    try:
+        menus = Menu.query.all()
+        return jsonify([
+            {
+                "id": menu.id,
+                "menu_date": menu.menu_date.isoformat(),
+                "items": [item.name for item in menu.items]
+            }
+            for menu in menus
+        ])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+@menu_bp.route('/<string:menu_date>',methods=['GET'])
+def get_menu_bt_date(menu_date):
+    try:
+        date_obj= datetime.strptime(menu_date,'%Y-%m-%d').date()
+        menu=Menu.query.filter_by(menu_date=date_obj).first()
+
+        if not menu :
+            return  jsonify({"error": "No menu found for this date"}), 404
+        
+
+        return jsonify({
+            "id": menu.id,
+            "menu_date": menu.menu_date.isoformat(),
+            "items": [item.name for item in menu.items]
+        })
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
         

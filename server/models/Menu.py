@@ -1,6 +1,5 @@
-from app import db
+from extensions import db
 
-from datetime import Date
 
 
 class Menu(db.Model):

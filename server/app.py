@@ -15,3 +15,24 @@ jwt = JWTManager(app)
 
 with app.app_context():
     db.create_all()
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    caterer_id = data.get('caterer_id') 
+    
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    if User.query.filter_by(email=email).first():
+        return jsonify({'error': 'Email already exists'}), 400
+    
+    user = User(email=email, caterer_id=caterer_id)
+    user.set_password(password)
+    
+    db.session.add(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User created successfully'}), 201

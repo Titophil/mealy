@@ -36,3 +36,23 @@ def signup():
     db.session.commit()
     
     return jsonify({'message': 'User created successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if not user or not user.check_password(password):
+        return jsonify({'error': 'Invalid email or password'}), 401
+    
+    access_token = create_access_token(identity=user.id)
+    return jsonify({
+        'access_token': access_token,
+        'user': {
+            'id': user.id,
+            'email': user.email
+        }
+    }), 200

@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from config import Config
 from models.user import User, db, bcrypt
 from models.order import Order
+from functools import wraps
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,6 +13,22 @@ app.config.from_object(Config)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
+
+
+def admin_required():
+    def wrapper(fn):
+        @wraps(fn)
+        @jwt_required()
+        def decorator(*args, **kwargs):
+            current_user_id = get_jwt_identity()
+            user = User.query.get(current_user_id)
+            if user and user.role == 'admin':
+                return fn(*args, **kwargs)
+            else:
+                return jsonify({"msg": "Admin access required"}), 403
+        return decorator
+    return wrapper
+
 
 with app.app_context():
     db.create_all()
@@ -21,6 +38,7 @@ def signup():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    role = data.get('role', 'customer')
     caterer_id = data.get('caterer_id') 
     
     if not email or not password:
@@ -29,7 +47,7 @@ def signup():
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already exists'}), 400
     
-    user = User(email=email, caterer_id=caterer_id)
+    user = User(email=email, role=role, caterer_id=caterer_id)
     user.set_password(password)
     
     db.session.add(user)

@@ -56,3 +56,22 @@ def login():
             'email': user.email
         }
     }), 200
+
+@app.route('/user/orders', methods=['GET'])
+@jwt_required()
+def get_user_orders():
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    orders = Order.query.filter_by(user_id=user_id).all()
+    order_list = [{
+        'id': order.id,
+        'meal_option_id': order.meal_option_id,
+        'order_date': order.order_date.isoformat(),
+        'price': order.price
+    } for order in orders]
+    
+    return jsonify({'orders': order_list}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)

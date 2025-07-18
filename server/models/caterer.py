@@ -1,10 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Column, Integer, String, Float, DateTime, Metadata
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import MetaData 
 from sqlalchemy_serializer import SerializerMixin
-from config import Config, bcrypt
+from config import Config
+from extensions import bcrypt
 
-metadata = Metadata(
+
+metadata = MetaData(
     naming_convention={
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_object_name)s",
     }

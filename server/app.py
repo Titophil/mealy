@@ -1,55 +1,84 @@
-from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from flask import Flask
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from config import Config
+from routes.admin_routes import admin_bp
+from routes.payment_routes import payment_bp
+from extensions import db  
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
 load_dotenv()
 
-# Local imports
-from config import Config
-from extensions import db, migrate, jwt
-from routes.admin_routes import admin_bp
-from routes.payment_routes import payment_bp
-from routes.auth_routes import auth_bp
-from routes.user_routes import user_bp
-from routes.Menu import menu_bp
+migrate = Migrate()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
+
+    # ✅ Define the route INSIDE the create_app function
+    @app.route("/")
+    def home():
+        return "Welcome to the Mealy API 🚀"
+
     app.config.from_object(Config)
 
-    # Daraja API keys (optional fallback if not in Config)
+    # Daraja Config
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
     app.config['DARAJA_SHORTCODE'] = os.getenv('DARAJA_SHORTCODE')
 
-    # Initialize extensions
+    # Init extensions
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     CORS(app)
 
     # Register Blueprints
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(menu_bp, url_prefix='/menus')
-    app.register_blueprint(user_bp, url_prefix='/user')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(payment_bp)
 
-    # Health check root route
-    @app.route("/")
+    return app  # ✅ Make sure to return the app!
+
+# ✅ Create app instance
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+from flask import Flask,jsonify
+from flask_cors import CORS
+from config import Config
+from extensions import db, migrate, jwt
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
+    CORS(app)
+
+    # Register Blueprints (empty for now)
+    # from routes.auth import auth_bp
+    # app.register_blueprint(auth_bp, url_prefix='/auth')
+    @app.route('/')
     def home():
-        return jsonify(message="Welcome to the Mealy API 🚀"), 200
+        return jsonify({"message": "Welcome to Mealy API!"})
+
+
+
+
+    from routes.Menu import menu_bp
+    app.register_blueprint(menu_bp,url_prefix='/menus')
+
 
     return app
 
-# Create the app instance
 app = create_app()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

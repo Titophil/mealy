@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -18,6 +19,7 @@ from routes.payment_routes import payment_bp
 from routes.auth_routes import auth_bp
 from routes.user_routes import user_bp
 from routes.Menu import menu_bp
+from routes.meal_routes import meal_bp
 
 def create_app():
     app = Flask(__name__)
@@ -39,6 +41,7 @@ def create_app():
     app.register_blueprint(menu_bp, url_prefix='/menus')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(meal_bp, url_prefix='/api')
     app.register_blueprint(payment_bp)
 
     # Health check root route

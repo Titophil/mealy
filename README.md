@@ -78,11 +78,9 @@ npm install react-redux @reduxjs/toolkit axios react-router-dom
 npm run dev
 
 ##📁 Folder Structure
-arduino
-Copy
-Edit
-mealy-backend/
-├── app/
+mealy/
+├── Client
+├── server/
 │   ├── models.py
 │   ├── routes/
 │   └── ...

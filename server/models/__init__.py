@@ -1,11 +1,6 @@
-from .payment import Payment
+
+from .MealOption import MealOption
 from .caterer import Caterer
-#from .order import Order
-from extensions import db
-
-class Caterer: pass
-class Order: pass
-class MealOption: pass
-class Menu: pass
-db = None
-
+from .payment import Payment
+#from .Order import Order  # Uncomment when implemented
+from .Menu import Menu    # Add if there's a Menu model

@@ -1,13 +1,10 @@
 from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from models import db
+from extensions import db, migrate, jwt
 from routes.meal_routes import meal_bp
 
-db = SQLAlchemy()
-migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -21,8 +18,9 @@ def create_app():
 
     @app.route('/')
     def home():
-        return "Welcome"
+        return "Welcome here"
 
+    
     app.register_blueprint(meal_bp, url_prefix='/api')
 
     return app

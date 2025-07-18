@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from config import Config
 from models.user import User, db, bcrypt
 from models.order import Order
@@ -20,15 +20,15 @@ def admin_required():
         @wraps(fn)
         @jwt_required()
         def decorator(*args, **kwargs):
+            claims = get_jwt()
             current_user_id = get_jwt_identity()
             user = User.query.get(current_user_id)
-            if user and user.role == 'admin':
+            if claims.get('role') == 'admin': 
                 return fn(*args, **kwargs)
             else:
                 return jsonify({"msg": "Admin access required"}), 403
         return decorator
     return wrapper
-
 
 with app.app_context():
     db.create_all()
@@ -66,7 +66,7 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'error': 'Invalid email or password'}), 401
     
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=user.id, additional_claims={"role": user.role})
     return jsonify({
         'access_token': access_token,
         'user': {
@@ -93,3 +93,4 @@ def get_user_orders():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

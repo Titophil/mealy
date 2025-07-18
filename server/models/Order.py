@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from extensions import db
+from server.extensions import db
 
 
 class Order(db.Model):
@@ -24,3 +24,13 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order user_id={self.user_id}, menu_item_id={self.menu_item_id}, date={self.order_date}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "menu_item_id": self.menu_item_id,
+            "order_date": self.order_date.isoformat() if self.order_date else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }

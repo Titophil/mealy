@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime, time
 from server.models.Order import Order
-from database import db_session
+from server.extensions import db
 from auth import login_required
 
 order_bp = Blueprint('orders', __name__)
@@ -29,8 +29,8 @@ def create_order():
         order_date=datetime.now()
     )
     
-    db_session.add(order)
-    db_session.commit()
+    db.session.add(order)
+    db.session.commit()
     
     return jsonify({'id': order.id}), 201
 
@@ -48,7 +48,7 @@ def update_order(id):
         return jsonify({'message': 'Cannot modify order after cutoff time'}), 400
     
     order.menu_item_id = data.get('menu_item_id', order.menu_item_id)
-    db_session.commit()
+    db.session.commit()
     
     return jsonify({'id': order.id}), 200
 

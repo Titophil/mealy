@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from services.daraja import lipa_na_mpesa, handle_mpesa_callback
+from server.services.daraja import lipa_na_mpesa, handle_mpesa_callback
+
 
 payment_bp = Blueprint('payment_bp', __name__)
 

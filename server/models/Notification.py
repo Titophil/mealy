@@ -1,8 +1,8 @@
-from app import db
+from server.extensions import db
 from sqlalchemy import ForeignKey
 from datetime import Date
 
-class Notification(db.Mpdel):
+class Notification(db.Model):
     __tablename__ ='notifications'
 
 

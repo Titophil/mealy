@@ -1,7 +1,7 @@
-from extensions import db
+from server.extensions import db
 from flask import Blueprint,request,jsonify
-from models.Menu import Menu
-from models.Menu_item import MenuItem
+from server.models.Menu import Menu
+from server.models.Menu_item import MenuItem
 from datetime import datetime
 
 

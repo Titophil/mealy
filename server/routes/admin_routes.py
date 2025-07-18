@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request 
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, Caterer, Order, MealOption, Menu
-from services.daraja import get_access_token
+from server.models import db, Caterer, Order, MealOption, Menu
+from server.services.daraja import get_access_token
 from datetime import date
 from sqlalchemy import func
 

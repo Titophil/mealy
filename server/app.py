@@ -1,9 +1,6 @@
+# server/app.py
 
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -12,20 +9,20 @@ import os
 load_dotenv()
 
 # Local imports
-from config import Config
-from extensions import db, migrate, jwt
-from routes.admin_routes import admin_bp
-from routes.payment_routes import payment_bp
-from routes.auth_routes import auth_bp
-from routes.user_routes import user_bp
-from routes.Menu import menu_bp
-from routes.meal_routes import meal_bp
+from .config import Config
+from .extensions import db, migrate, jwt
+from .routes.admin_routes import admin_bp
+from .routes.payment_routes import payment_bp
+from .routes.auth_routes import auth_bp
+from .routes.user_routes import user_bp
+from .routes.Menu import menu_bp
+from .routes.meal_routes import meal_bp
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Daraja API keys (optional fallback if not in Config)
+    # Optional Daraja config from .env
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
     app.config['DARAJA_SHORTCODE'] = os.getenv('DARAJA_SHORTCODE')
@@ -44,14 +41,14 @@ def create_app():
     app.register_blueprint(meal_bp, url_prefix='/api')
     app.register_blueprint(payment_bp)
 
-    # Health check root route
+    # Health check route
     @app.route("/")
     def home():
         return jsonify(message="Welcome to the Mealy API 🚀"), 200
 
     return app
 
-# Create the app instance
+# Create app instance
 app = create_app()
 
 if __name__ == '__main__':

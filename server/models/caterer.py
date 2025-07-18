@@ -1,19 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from sqlalchemy import MetaData 
 from sqlalchemy_serializer import SerializerMixin
-from config import Config
-from extensions import bcrypt
-
-
-metadata = MetaData(
-    naming_convention={
-        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_object_name)s",
-    }
-)
-
-db = SQLAlchemy(metadata=metadata)
+from server.extensions import bcrypt, db
 
 class Caterer(db.Model, SerializerMixin):
     __tablename__ = 'caterers'
@@ -26,19 +14,21 @@ class Caterer(db.Model, SerializerMixin):
     created_at = Column(DateTime, server_default=db.func.now())
 
     # Relationships
-    mealOptions = db.relationship('MealOption',
-                                  backref='caterer',
-                                  cascade='all, delete-orphan')
-    orders = db.relationship('Order',
-                             backref='caterer',
-                             cascade='all, delete-orphan')
-
-
-
-    menus = db.relationship('Menu', 
-                            backref='caterer', 
-                            cascade='all, delete-orphan')
-
+    meal_options = db.relationship(
+        'MealOption',
+        backref='caterer',
+        cascade='all, delete-orphan'
+    )
+    orders = db.relationship(
+        'Order',
+        backref='caterer',
+        cascade='all, delete-orphan'
+    )
+    menus = db.relationship(
+        'Menu',
+        backref='caterer',
+        cascade='all, delete-orphan'
+    )
 
     @hybrid_property
     def password(self):

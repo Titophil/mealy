@@ -41,6 +41,14 @@ export default function Sidebar() {
              Revenue
            </NavLink>
          </li>
+                  <li>
+           <NavLink
+             to="/admin/menu-builder"
+             className={({ isActive }) => (isActive ? "active" : "")}
+           >
+             Menu Builder
+           </NavLink>
+         </li>
        </ul>
      </nav>
    </div>

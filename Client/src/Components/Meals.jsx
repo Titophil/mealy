@@ -26,7 +26,7 @@ export default function Meals() {
    updatedItems[index] = { name: updatedItems[index].name, status: "Done" };
 
 
-   axios.put(`http://localhost:5000/menu/${menu.id}/update`, { items: updatedItems })
+   axios.put(`http://localhost:5000/menus/${menu.id}/update`, { items: updatedItems })
      .then(() => {
        setMenu(prev => ({ ...prev, items: updatedItems }));
      })

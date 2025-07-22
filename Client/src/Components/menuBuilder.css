@@ -1,0 +1,59 @@
+.menu-builder-container {
+  padding: 2rem;
+  background-color: #fff;
+  color: #333;
+}
+
+.menu-message {
+  margin: 1rem 0;
+  font-weight: bold;
+  color: green;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.menu-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fafafa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.menu-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.menu-info {
+  margin-top: 0.75rem;
+}
+
+.edit-btn {
+  margin-top: 0.5rem;
+  background-color: #f39c12;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  margin-top: 2rem;
+  padding: 10px 20px;
+  background: #27ae60;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+

@@ -1,0 +1,229 @@
+
+
+.dashboard-section {
+    margin-bottom: 2rem;
+  }
+   .dashboard-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 2rem;
+    margin-left: 350px;
+    margin-top: 80px;
+  }
+   .dashboard-card {
+    background-color: #fefefe;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    width: 300px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+   .dashboard-card:hover {
+    transform: translateY(-2px);
+    background-color: #f5faff;
+  }
+   .dashboard-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+  }
+   .dashboard-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+  }
+   .dashboard-card li {
+    font-size: 0.95rem;
+    margin: 0.3rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+   .dashboard-card button {
+    background-color: #e63946;
+    color: #fff;
+    border: none;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    border: 1px solid #f3c38b;
+    color: white;
+    padding: 2rem 1rem;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+   .sidebar h2 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #ecf0f1;
+  }
+   .sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+   .sidebar nav ul li {
+    margin-bottom: 1rem;
+  }
+   .sidebar nav ul li a {
+    text-decoration: none;
+    color: #bdc3c7;
+    font-size: 1.1rem;
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+   .sidebar nav ul li a:hover,
+  .sidebar nav ul li a.active {
+    background-color: #f3c38b;
+    color: #ecf0f1;
+  }
+  .revenue-graph-container {
+    background-color: #fffaf0;
+    padding: 2rem;
+    border-radius: 10px;
+    border: 1px solid #f3c38b;
+    box-shadow: 0 2px 8px rgba(255, 136, 0, 0.2);
+    margin-top: 100px;
+    margin-left: 210px;
+  }
+  .today-card {
+    background-color: #fff5e6;
+    padding: 1.5rem 2rem;
+    border-radius: 10px;
+    border: 1px solid #ffcc80;
+    box-shadow: 0 2px 8px rgba(255, 136, 0, 0.2);
+    margin-bottom: 2rem;
+    text-align: center;
+    animation: fadeIn 1s ease;
+  }
+   .today-card h2 {
+    font-size: 1.6rem;
+    color: #d35400;
+    margin-bottom: 0.5rem;
+  }
+   .today-card .amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+  }
+   @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+   .meals-container {
+    padding: 2rem;
+    width: calc(100% - 200px);
+    margin-left: 200px;
+    margin-top: 80px;
+    min-height: 100vh;
+    background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.8)),
+                url('/src/assets/culinary.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #2c3e50;
+  }
+   .meals-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #d35400;
+  }
+   .menu-card {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  }
+   .menu-card h3 {
+    margin-bottom: 1rem;
+    color: #34495e;
+  }
+   .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+  }
+   .menu-item span {
+    flex: 1;
+    color: #333;
+  }
+   .mark-done-btn {
+    margin-left: 1rem;
+    padding: 0.4rem 1rem;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+   .mark-done-btn:hover {
+    background-color: #219150;
+  }
+   .error-message {
+    color: red;
+    text-align: center;
+    font-weight: bold;
+  }
+   .orders-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    max-height: 500px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 500px;
+    margin-top: 100px;
+  }
+   .orders-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+  }
+   .order-entry {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+   .order-entry:last-child {
+    border-bottom: none;
+  }
+   .order-entry p {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+   .order-entry strong {
+    color: #444;
+  }
+   .order-entry span {
+    color: #555;
+  }
+ 

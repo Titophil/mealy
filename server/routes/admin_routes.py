@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from server.models import db, Caterer, Order, MealOption, Menu
 from server.services.daraja import get_access_token
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import func
 
 admin_bp = Blueprint('admin_bp', __name__)
@@ -95,3 +95,44 @@ def test_daraja_token():
         return jsonify({"access_token": token})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@admin_bp.route('/simulate_payment', methods=['POST'])
+@jwt_required()
+def simulate_payment():
+    data = request.get_json()
+    phone = data.get("phone_number")
+    amount = data.get("amount")
+
+    if not phone or not amount:
+        return jsonify({"error": "Phone number and amount required"}), 400
+
+    try:
+        # Assuming you have an stk_push_service module
+        from server.services.daraja import initiate_stk_push
+        response = initiate_stk_push(phone, amount)
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@admin_bp.route('/admin/overview', methods=['GET'])
+@jwt_required()
+def admin_overview():
+    today = datetime.now().date()
+
+    pending_orders = Order.query.filter_by(status='Pending').count()
+
+    delivered_today = Order.query.filter(
+        db.func.date(Order.order_date) == today,
+        Order.status == 'Delivered'
+    ).all()
+
+    revenue = sum(order.menu_item.price for order in delivered_today)
+
+    available_meals = Menu.query.filter_by(is_deleted=False).count()
+
+    return jsonify({
+        'pending_orders': pending_orders,
+        'todays_revenue': revenue,
+        'available_meals': available_meals
+    })

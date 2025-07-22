@@ -35,14 +35,6 @@ export default function Sidebar() {
          </li>
          <li>
            <NavLink
-             to="/admin/history"
-             className={({ isActive }) => (isActive ? "active" : "")}
-           >
-             Order History
-           </NavLink>
-         </li>
-         <li>
-           <NavLink
              to="/admin/revenue"
              className={({ isActive }) => (isActive ? "active" : "")}
            >

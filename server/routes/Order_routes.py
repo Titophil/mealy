@@ -69,3 +69,23 @@ def get_current_order():
         'menu_item_id': order.menu_item_id,
         'order_date': order.order_date
     })
+@order_bp.route('/orders/<int:id>/deliver', methods=['PUT'])
+@login_required
+def mark_as_delivered(id):
+    order = Order.query.get_or_404(id)
+    order.status = 'Delivered'
+    db.session.commit()
+    return jsonify({'message': 'Order marked as delivered', 'id': order.id}), 200
+
+@order_bp.route('/orders/summary', methods=['GET'])
+@login_required
+def order_summary():
+    total_orders = Order.query.count()
+    pending_orders = Order.query.filter_by(status='Pending').count()
+    delivered_orders = Order.query.filter_by(status='Delivered').count()
+
+    return jsonify({
+        'total_orders': total_orders,
+        'pending_orders': pending_orders,
+        'delivered_orders': delivered_orders
+    })

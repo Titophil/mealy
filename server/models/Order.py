@@ -15,8 +15,10 @@ class Order(db.Model):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    user = relationship("User", back_populates="orders")
+    user = db.relationship('User', back_populates='orders')
     menu_item = relationship("MenuItem", back_populates="orders")
+    caterer_id = db.Column(db.Integer, db.ForeignKey('caterers.id'))
+
 
     __table_args__ = (
         UniqueConstraint('user_id', 'order_date', name='uix_user_date'),

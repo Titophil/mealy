@@ -15,7 +15,8 @@ class User(db.Model):
     caterer_id = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # orders = db.relationship('Order', backref='user', lazy=True)
+    orders = db.relationship('Order', back_populates='user')
+
 
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')

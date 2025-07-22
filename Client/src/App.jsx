@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { appRoutes } from "./Routes"; // ✅ this is correct
+import "./App.css"; // Import your global styles
+import "./Components/admin.css"; // Import admin styles
 
 
 

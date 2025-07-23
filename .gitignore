@@ -1,1 +1,41 @@
-server/routes/__pycache__
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyd
+*.pyc
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+.flaskenv
+env/
+
+# Flask-SQLAlchemy database
+*.sqlite3
+*.db
+
+# Flask-Migrate
+migrations/
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Pytest
+htmlcov/
+.coverage
+
+# Jupyter (if you happen to run any notebooks for testing)
+.ipynb_checkpoints/
+
+#node
+node_modules/

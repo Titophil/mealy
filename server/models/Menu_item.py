@@ -9,6 +9,8 @@ class MenuItem(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     menu_id=db.Column(db.Integer,ForeignKey('menus.id'),nullable=False)
+    orders = db.relationship('Order', back_populates='menu_item')
+
 
 
     menu = db.relationship('Menu', back_populates='items')

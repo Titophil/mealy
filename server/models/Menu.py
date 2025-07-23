@@ -10,3 +10,4 @@ class Menu(db.Model):
 
 
     items= db.relationship('MenuItem', back_populates='menu',cascade='all, delete-orphan')
+    caterer_id = db.Column(db.Integer, db.ForeignKey('caterers.id'), nullable=False)

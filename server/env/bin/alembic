@@ -1,4 +1,4 @@
-#!/home/moreenk/Development/mealy/server/env/bin/python3
+#!/home/moreenk/Development/mealy/server/env/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

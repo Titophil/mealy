@@ -1,39 +1,64 @@
-import { Navigate } from "react-router-dom";
-import NotFound from "./Components/NotFound";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Public Pages
+import PublicLandingPage from "./Pages/PublicLandingPage.jsx";
+import LoginPage from "./Pages/LoginPage.jsx";
+import SignupPage from "./Pages/SignupPage.jsx";
+
+// Admin
 import Admin from "./Pages/Admin";
 import Overview from "./Components/Overview";
 import OrdersCard from "./Components/OrdersCard";
 import Meals from "./Components/Meals";
 import Revenue from "./Components/Revenue";
 import MenuBuilder from "./Components/MenuBuilder";
-// import MenuViewer from "../Components/MenuViewer";
 
-import React from "react";
+// User & Order
+import OrderForm from "./Pages/OrderForm";
+import TodaysOrder from "./Pages/TodaysOrder";
+import UserDashboard from "./Pages/UserDashboard.jsx";
+import OrderHistory from "./Pages/OrderHistory.jsx";
 
-export const appRoutes = [
-  {
-    path: "/",
-    element: <Navigate to="/admin" />, // 👈 Redirect root path
-  },
-  {
-    path: "/admin",
-    element: <Admin />,
-    children: [
-      {
-        index: true, // 👈 This makes /admin default to Overview
-        element: <Overview />
-      },
-      { path: "overview", element: <Overview /> },
-      { path: "orders", element: <OrdersCard /> },
-      { path: "meals", element: <Meals /> },
-      { path: "revenue", element: <Revenue /> },
-      { path: "menu-builder", element: <MenuBuilder /> },
-    ],
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
-];
+// Auth
+import PrivateRoute from "./auth/PrivateRoute.jsx";
 
-export default appRoutes;
+// Shared
+import NotFound from "./Components/NotFound";
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      {/* Root Redirect */}
+      <Route path="/" element={<Navigate to="/admin" />} />
+
+      {/* Public Pages */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/landing" element={<PublicLandingPage />} />
+
+      {/* Admin Pages */}
+      <Route path="/admin" element={<Admin />}>
+        <Route index element={<Overview />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="orders" element={<OrdersCard />} />
+        <Route path="meals" element={<Meals />} />
+        <Route path="menu-builder" element={<MenuBuilder />} />
+        <Route path="revenue" element={<Revenue />} />
+      </Route>
+
+      {/* User Pages (Protected) */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/user/dashboard" element={<UserDashboard />} />
+        <Route path="/user/orders" element={<OrderHistory />} />
+        <Route path="/order" element={<OrderForm />} />
+        <Route path="/order/current" element={<TodaysOrder />} />
+      </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
+export default AppRoutes;

@@ -1,4 +1,1 @@
-__pycache__/
-*.pyc
-.env/
-server/env/
+server/routes/__pycache__

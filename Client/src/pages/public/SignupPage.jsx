@@ -18,8 +18,8 @@ const SignupPage = () => {
     setSignupError('');
     try {
       const response = await signupUser(data);
-      login(response.token, response.user);
-      navigate('/user/dashboard');
+      // login(response.token, response.user);
+      navigate('/login');
     } catch (error) {
       setSignupError(error);
     } finally {

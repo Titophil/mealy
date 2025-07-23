@@ -10,10 +10,9 @@ order_bp = Blueprint('orders', __name__)
 @login_required
 def create_order():
     data = request.get_json()
-    user_id = request.user.id  # Assuming auth middleware adds user to request
+    user_id = request.user.id  # Injected by auth decorator
     menu_item_id = data.get('menu_item_id')
 
-    # Check for existing order today
     today = datetime.now().date()
     existing_order = Order.query.filter(
         Order.user_id == user_id,
@@ -28,10 +27,10 @@ def create_order():
         menu_item_id=menu_item_id,
         order_date=datetime.now()
     )
-    
+
     db.session.add(order)
     db.session.commit()
-    
+
     return jsonify({'id': order.id}), 201
 
 @order_bp.route('/orders/<int:id>', methods=['PUT'])
@@ -39,17 +38,16 @@ def create_order():
 def update_order(id):
     order = Order.query.get_or_404(id)
     data = request.get_json()
-    
-    # Check if after cutoff time (10 AM)
+
     cutoff_time = time(10, 0)
     current_time = datetime.now().time()
-    
+
     if current_time > cutoff_time:
         return jsonify({'message': 'Cannot modify order after cutoff time'}), 400
-    
+
     order.menu_item_id = data.get('menu_item_id', order.menu_item_id)
     db.session.commit()
-    
+
     return jsonify({'id': order.id}), 200
 
 @order_bp.route('/orders/current', methods=['GET'])
@@ -60,15 +58,16 @@ def get_current_order():
         Order.user_id == request.user.id,
         db.func.date(Order.order_date) == today
     ).first()
-    
+
     if not order:
         return jsonify({'message': 'No order found for today'}), 404
-        
+
     return jsonify({
         'id': order.id,
         'menu_item_id': order.menu_item_id,
         'order_date': order.order_date
     })
+
 @order_bp.route('/orders/<int:id>/deliver', methods=['PUT'])
 @login_required
 def mark_as_delivered(id):
@@ -89,3 +88,23 @@ def order_summary():
         'pending_orders': pending_orders,
         'delivered_orders': delivered_orders
     })
+
+@order_bp.route('/user/orders', methods=['GET'])
+@login_required
+def get_user_orders():
+    try:
+        user_id = request.user.id
+        orders = Order.query.filter_by(user_id=user_id).order_by(Order.order_date.desc()).all()
+
+        return jsonify([
+            {
+                'id': order.id,
+                'menu_item_id': order.menu_item_id,
+                'order_date': order.order_date.isoformat(),
+                'status': order.status
+            }
+            for order in orders
+        ]), 200
+
+    except Exception as e:
+        return jsonify({'message': 'Failed to fetch user orders', 'error': str(e)}), 500

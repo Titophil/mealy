@@ -10,6 +10,7 @@ class Order(db.Model):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     menu_item_id = Column(Integer, ForeignKey('menu_items.id'), nullable=False)
+    caterer_id = Column(Integer, ForeignKey('caterers.id'), nullable=True)
     order_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -4,6 +4,9 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from flask_migrate import Migrate
+
+migrate = Migrate()
 
 # Load environment variables
 load_dotenv()
@@ -50,6 +53,6 @@ def create_app():
 
 # Create app instance
 app = create_app()
-
+migrate.init_app(app, db)
 if __name__ == '__main__':
     app.run(debug=True)

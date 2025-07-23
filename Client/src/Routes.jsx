@@ -10,7 +10,6 @@ import SignupPage from "./Pages/SignupPage.jsx";
 import Admin from "./Pages/Admin";
 import Overview from "./Components/Overview";
 import OrdersCard from "./Components/OrdersCard";
-import Meals from "./Components/Meals";
 import Revenue from "./Components/Revenue";
 import MealList from "./Components/MealList";
 import MealForm from "./Components/MealForm";

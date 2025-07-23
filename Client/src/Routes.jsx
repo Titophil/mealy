@@ -1,13 +1,23 @@
+<<<<<<< HEAD
 import React from "react";
 import NotFound from "./Components/NotFound";
+=======
+>>>>>>> 90b96a69313267ff5f70bacf78f43dab0f34fd6f
 import Admin from "./Pages/Admin";
 import Overview from "./Components/Overview";
 import OrdersCard from "./Components/OrdersCard";
 import Meals from "./Components/Meals";
 import Revenue from "./Components/Revenue";
+<<<<<<< HEAD
 import OrderForm from "./Components/OrderForm";       
 import TodaysOrder from "./Components/TodaysOrder";   
 import PrivateRoute from "./Components/PrivateRoute"; 
+=======
+import MealList from "./Components/MealList";
+import MealForm from "./Components/MealForm";
+import React from "react";
+import NotFound from "./Components/NotFound";
+>>>>>>> 90b96a69313267ff5f70bacf78f43dab0f34fd6f
 
 export const appRoutes = [
   {
@@ -17,7 +27,8 @@ export const appRoutes = [
       { index: true, element: <Overview /> },
       { path: "overview", element: <Overview /> },
       { path: "orders", element: <OrdersCard /> },
-      { path: "meals", element: <Meals /> },
+      { path: "meals", element: <MealList /> },
+      { path: "meals/add", element: <MealForm /> },
       { path: "revenue", element: <Revenue /> },
     ],
   },
@@ -42,5 +53,3 @@ export const appRoutes = [
     element: <NotFound />,
   },
 ];
-
-export default appRoutes;

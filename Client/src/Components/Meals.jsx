@@ -1,69 +1,65 @@
-import React, { useEffect, useState } from "react";
-import './admin.css';
-import axios from "axios";
 
+import React, { useEffect, useState } from 'react';
+import { fetchAllExternalMeals } from '../Api/Api.jsx';
 
-export default function Meals() {
- const [menu, setMenu] = useState(null);
- const [error, setError] = useState("");
- const today = new Date().toISOString().slice(0, 10);
+const Meals = () => {
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    fetchAllExternalMeals()
+      .then((res) => {
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setMeals(data);
+        } else {
+          console.error('Expected array but got:', data);
+          setMeals([]);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching meals:', err);
+        setMeals([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
- useEffect(() => {
-   axios.get(`http://localhost:5000/menu/${today}`)
-     .then((response) => {
-       setMenu(response.data);
-     })
-     .catch((error) => {
-       console.error("Error fetching today's menu:", error);
-       setError("Failed to load today's menu.");
-     });
- }, []);
+  return (
+    <div style={{ padding: '1rem' }}>
+      {/* <h2 style={{ marginBottom: '0.1rem' }}>All Meals from TheMealDB (A–Z)</h2> */}
 
+  {loading ? (
+    <p>Loading meals...</p>
+  ) : (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+      {meals.map((meal) => (
+        <div
+          key={meal.id || meal.idMeal}
+          style={{
+            border: '1px solid #ccc',
+            padding: '1rem',
+            borderRadius: '8px',
+            width: '250px',
+            backgroundColor: '#fff',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            gap:'10px',
+          }}
+        >
+          <img
+            src={meal.image || meal.strMealThumb}
+            alt={meal.name || meal.strMeal}
+            style={{ width: '100%', borderRadius: '4px' }}
+          />
+          <h4>{meal.name || meal.strMeal}</h4>
+          <p style={{ fontSize: '0.9rem', color: '#555' }}>
+            {meal.category || meal.strCategory} &bull; {meal.area || meal.strArea}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+  );
+};
 
- const markAsDone = (index) => {
-   const updatedItems = [...menu.items];
-   updatedItems[index] = { name: updatedItems[index].name, status: "Done" };
-
-
-   axios.put(`http://localhost:5000/menus/${menu.id}/update`, { items: updatedItems })
-     .then(() => {
-       setMenu(prev => ({ ...prev, items: updatedItems }));
-     })
-     .catch(err => {
-       console.error("Failed to update item status:", err);
-       alert("Failed to update item.");
-     });
- };
-
-
- return (
-   <div className="meals-container">
-     <h2 className="meals-title">Today's Menu ({today})</h2>
-
-
-     {error && <p className="error-message">{error}</p>}
-
-
-     {!menu ? (
-       <p>No menu available for today.</p>
-     ) : (
-       <div className="menu-card">
-         <h3>{menu.menu_date}</h3>
-         <ul>
-           {menu.items.map((item, index) => (
-             <li key={index} className="menu-item">
-               <span>{item.name ?? item} — {item.status === "Done" ? "✅" : "❌"}</span>
-               {item.status !== "Done" && (
-                 <button className="mark-done-btn" onClick={() => markAsDone(index)}>
-                   Mark as Done
-                 </button>
-               )}
-             </li>
-           ))}
-         </ul>
-       </div>
-     )}
-   </div>
- );
-}
+export default Meals;

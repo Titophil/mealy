@@ -5,3 +5,4 @@ from .caterer import Caterer
 from .payment import Payment
 from .Order import Order
 from .Menu import Menu
+from .Menu_item import MenuItem

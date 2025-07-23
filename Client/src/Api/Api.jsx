@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Create Axios instance
+// Axios instance for Flask backend
 const api = axios.create({
   baseURL: 'http://localhost:5000',
   headers: {
@@ -8,7 +8,7 @@ const api = axios.create({
   },
 });
 
-// Add token to all requests
+// Attach JWT token if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -32,6 +32,11 @@ export const getMeals = () => api.get('/meals');
 export const createMeal = (meal) => api.post('/meals', meal);
 export const updateMeal = (id, meal) => api.put(`/meals/${id}`, meal);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`);
+
+// Optional: External meals (from public API wrapped in Flask backend)
+export const fetchAllExternalMeals = () => api.get('/api/meals/external');
+export const searchExternalMeals = (query) =>
+  api.get(`/api/meals/external/search?q=${query}`);
 
 // ============================
 // Menu APIs

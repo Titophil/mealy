@@ -3,7 +3,6 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 
-
 bcrypt = Bcrypt()
 
 class User(db.Model):
@@ -15,8 +14,12 @@ class User(db.Model):
     caterer_id = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+<<<<<<< HEAD
     orders = db.relationship('Order', back_populates='user')
 
+=======
+    orders = db.relationship('Order', back_populates='user', lazy=True)
+>>>>>>> origin/neema
 
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')

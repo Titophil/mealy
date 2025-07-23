@@ -1,5 +1,6 @@
 from server.extensions import db
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 
 
@@ -14,5 +15,6 @@ class MenuItem(db.Model):
 
 
     menu = db.relationship('Menu', back_populates='items')
+    orders = db.relationship('Order', back_populates='menu_item', cascade='all, delete-orphan')
     
 

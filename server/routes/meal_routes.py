@@ -14,7 +14,6 @@ def caterer_required(fn):
     return wrapper
 
 @meal_bp.route('/meals', methods=['GET'])
-@jwt_required()
 def get_meals():
     meals = MealOption.query.all()
     return jsonify([{

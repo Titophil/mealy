@@ -1,9 +1,12 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import PublicLandingPage from "./pages/public/PublicLandingPage.jsx";
-import LoginPage from "./pages/public/LoginPage.jsx";
-import SignupPage from "./pages/public/SignupPage.jsx";
 
+// Public pages
+import PublicLandingPage from "./Pages/PublicLandingPage.jsx";
+import LoginPage from "./Pages/LoginPage.jsx";
+import SignupPage from "./Pages/SignupPage.jsx";
+
+// Admin components
 import Admin from "./Pages/Admin";
 import Overview from "./Components/Overview";
 import OrdersCard from "./Components/OrdersCard";
@@ -12,12 +15,14 @@ import Revenue from "./Components/Revenue";
 import MealList from "./Components/MealList";
 import MealForm from "./Components/MealForm";
 
-import OrderForm from "./Components/OrderForm";
-import TodaysOrder from "./Components/TodaysOrder";
-import PrivateRoute from "./Components/PrivateRoute";
+// User + Order pages
+import OrderForm from "./Pages/OrderForm";
+import TodaysOrder from "./Pages/TodaysOrder";
+import UserDashboard from "./Pages/UserDashboard.jsx";
+import OrderHistory from "./Pages/OrderHistory.jsx";
 
-import UserDashboard from "./pages/user/UserDashboard.jsx";
-import OrderHistory from "./pages/user/OrderHistory.jsx";
+// Shared components
+import PrivateRoute from "./auth/PrivateRoute.jsx";
 import NotFound from "./Components/NotFound";
 
 const AppRoutes = () => {

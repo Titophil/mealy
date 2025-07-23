@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUserOrders } from '../../api/orders';
-import OrderCard from '../../components/user/OrderCard.jsx';
-import { useAuth } from '../../auth/AuthContext';
+import { fetchUserOrders } from '../Api/Api.jsx';
+import OrderCard from '../Components/OrderCard.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);

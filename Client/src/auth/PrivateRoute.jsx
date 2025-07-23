@@ -1,16 +1,6 @@
-<<<<<<< HEAD
-import { Navigate } from 'react-router-dom';
-
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" />;
-};
-
-export default PrivateRoute;
-=======
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './AuthContext'; // make sure this exists
 
 const PrivateRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -19,4 +9,3 @@ const PrivateRoute = () => {
 };
 
 export default PrivateRoute;
->>>>>>> origin/neema

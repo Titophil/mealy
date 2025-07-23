@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { placeOrder } from '../api/orderApi';
-import OrderSuccessModal from '../components/OrderSuccessModal';
+import { placeOrder } from '../Api/Api.jsx'; // ✅ Ensure the correct file extension
+import OrderSuccessModal from '../Components/OrderSuccessModal'; // ✅ Capital 'C' in Components
 
 const OrderForm = () => {
   const [menuItemId, setMenuItemId] = useState('');

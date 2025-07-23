@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext';
-import { signupUser } from '../../api/auth';
+import { useAuth } from '../auth/AuthContext';
+import { signupUser } from '../Api/Api';
 
 const SignupPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();

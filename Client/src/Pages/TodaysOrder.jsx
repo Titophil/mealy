@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { fetchTodaysOrder } from '../api/orderApi';
 
 const TodaysOrder = () => {
   const [order, setOrder] = useState(null);

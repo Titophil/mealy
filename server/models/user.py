@@ -3,7 +3,6 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 
-
 bcrypt = Bcrypt()
 
 class User(db.Model):

@@ -11,7 +11,7 @@ import Admin from "./Pages/Admin";
 import Overview from "./Components/Overview";
 import OrdersCard from "./Components/OrdersCard";
 import Revenue from "./Components/Revenue";
-import MealList from "./Components/MealList";
+import Meals from "./Components/Meals";
 import MealForm from "./Components/MealForm";
 
 // User + Order pages
@@ -37,7 +37,7 @@ const AppRoutes = () => {
         <Route index element={<Overview />} />
         <Route path="overview" element={<Overview />} />
         <Route path="orders" element={<OrdersCard />} />
-        <Route path="meals" element={<MealList />} />
+        <Route path="meals" element={<Meals />} />
         <Route path="meals/add" element={<MealForm />} />
         <Route path="revenue" element={<Revenue />} />
       </Route>

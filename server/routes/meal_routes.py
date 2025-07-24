@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-from server.models import db, MealOption
+from server.models import db, MealOption, User  # Ensure User is imported
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import functools
 import requests
 import string
+import os
 
 meal_bp = Blueprint('meals', __name__)
 
@@ -12,11 +13,14 @@ def caterer_required(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role != 'caterer':
+            return jsonify({"error": "Caterer access required"}), 403
         return fn(*args, **kwargs)
     return wrapper
 
 # -------------------- Internal CRUD APIs -------------------- #
-@meal_bp.route('/meals', methods=['GET'])
+@meal_bp.route('/', methods=['GET'])
 def get_meals():
     meals = MealOption.query.all()
     return jsonify([{
@@ -27,7 +31,7 @@ def get_meals():
         "caterer_id": m.caterer_id
     } for m in meals]), 200
 
-@meal_bp.route('/meals', methods=['POST'])
+@meal_bp.route('', methods=['POST'])
 @jwt_required()
 @caterer_required
 def create_meal():
@@ -42,7 +46,7 @@ def create_meal():
     db.session.commit()
     return jsonify(message="Meal created", id=meal.id), 201
 
-@meal_bp.route('/meals/<int:id>', methods=['PUT', 'DELETE'])
+@meal_bp.route('/<int:id>', methods=['PUT', 'DELETE'])
 @jwt_required()
 @caterer_required
 def update_or_delete_meal(id):
@@ -65,7 +69,7 @@ def update_or_delete_meal(id):
         return jsonify(message="Meal deleted"), 200
 
 # -------------------- External API Fetch -------------------- #
-@meal_bp.route('/meals/external', methods=['GET'])
+@meal_bp.route('/external', methods=['GET'])
 def get_external_meals():
     meals = []
     for letter in string.ascii_lowercase:
@@ -77,7 +81,6 @@ def get_external_meals():
             print(f"Error fetching meals for {letter}: {e}")
             continue
 
-    # ✅ Use frontend-expected keys
     simplified_meals = [{
         "idMeal": meal['idMeal'],
         "strMeal": meal['strMeal'],
@@ -89,7 +92,7 @@ def get_external_meals():
     return jsonify(simplified_meals), 200
 
 # -------------------- Optional Search Endpoint -------------------- #
-@meal_bp.route('/meals/external/search', methods=['GET'])
+@meal_bp.route('/external/search', methods=['GET'])
 def search_external_meals():
     query = request.args.get('q')
     if not query:
@@ -107,5 +110,26 @@ def search_external_meals():
             "strCategory": m['strCategory'],
             "strArea": m['strArea']
         } for m in data if m]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# -------------------- Spoonacular API Integration -------------------- #
+@meal_bp.route('/spoonacular', methods=['GET'])
+def get_spoonacular_meals():
+    api_key = os.getenv('SPOONACULAR_API_KEY')
+    if not api_key:
+        return jsonify({"error": "Spoonacular API key not set"}), 400
+
+    url = f"https://api.spoonacular.com/recipes/complexSearch?number=10&apiKey={api_key}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        results = response.json().get("results", [])
+        simplified = [{
+            "id": meal['id'],
+            "title": meal['title'],
+            "image": meal.get('image')
+        } for meal in results]
+        return jsonify(simplified), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

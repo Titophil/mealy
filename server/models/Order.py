@@ -1,25 +1,21 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from server.extensions import db
-
+from server.extensions import db  # <== Make sure this line is here
 
 class Order(db.Model):
     __tablename__ = 'orders'
     
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    menu_item_id = Column(Integer, ForeignKey('menu_items.id'), nullable=False)
-    caterer_id = Column(Integer, ForeignKey('caterers.id'), nullable=True)
-    order_date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    menu_item_id = db.Column(db.Integer, db.ForeignKey('menu_items.id'), nullable=False)
+    caterer_id = db.Column(db.Integer, db.ForeignKey('caterers.id'), nullable=True)
+    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships
     user = db.relationship('User', back_populates='orders')
-    menu_item = relationship("MenuItem", back_populates="orders")
-    caterer_id = db.Column(db.Integer, db.ForeignKey('caterers.id'))
-
+    menu_item = db.relationship("MenuItem", back_populates="orders")
 
     __table_args__ = (
         UniqueConstraint('user_id', 'order_date', name='uix_user_date'),

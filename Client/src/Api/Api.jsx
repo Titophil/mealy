@@ -1,6 +1,6 @@
+// File: src/Api/Api.jsx
 import axios from 'axios';
 
-// Axios instance for Flask backend
 const api = axios.create({
   baseURL: 'http://localhost:5000',
   headers: {
@@ -8,7 +8,6 @@ const api = axios.create({
   },
 });
 
-// Attach JWT token if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -25,12 +24,12 @@ export const signupUser = (userData) => api.post('/auth/signup', userData);
 export const placeOrder = (menu_item_id) => api.post('/orders', { menu_item_id });
 export const updateOrder = (id, menu_item_id) => api.put(`/orders/${id}`, { menu_item_id });
 export const fetchTodaysOrder = () => api.get('/orders/current');
-export const fetchUserOrders = () => api.get('/user/orders');
+export const fetchUserOrders = () => api.get('/users/orders');
 
 // -------- MENU --------
-export const fetchTodayMenu = () => api.get('/menu/today');
+export const fetchTodayMenu = () => api.get('/menus/today');
 export const updateMenuItemStatus = (menuId, items) =>
-  api.put(`/menu/${menuId}/update`, { items });
+  api.put(`/menus/${menuId}/update`, { items });
 
 // -------- MEALS --------
 export const fetchMeals = () => api.get('/meals');
@@ -38,11 +37,9 @@ export const createMeal = (mealData) => api.post('/meals', mealData);
 export const updateMeal = (id, mealData) => api.put(`/meals/${id}`, mealData);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`);
 
-// -------- EXTERNAL MEALS (From Flask backend that wraps TheMealDB) --------
+// -------- EXTERNAL MEALS --------
+export const fetchAllExternalMeals = () => api.get('/meals/external');
+export const searchExternalMeals = (query) => api.get(`/meals/external/search?q=${query}`);
 
-// ✅ Correct endpoint: /api/meals/external
-export const fetchAllExternalMeals = () => api.get('/api/meals/external');
-
-// ✅ Optional search endpoint: /api/meals/external/search?q=chicken
-export const searchExternalMeals = (query) =>
-  api.get(`/api/meals/external/search?q=${query}`);
+// -------- SPOONACULAR MEALS --------
+export const fetchSpoonacularMeals = () => api.get('/meals/spoonacular');

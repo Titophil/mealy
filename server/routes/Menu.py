@@ -3,10 +3,11 @@ from flask import Blueprint,request,jsonify
 from server.models.Menu import Menu
 from server.models.Menu_item import MenuItem
 from datetime import datetime
+from flask_cors import CORS
 
 
 menu_bp = Blueprint('menu_bp', __name__)
-
+CORS(menu_bp)
 
 @menu_bp.route('', methods=['POST'])
 def create_menu():

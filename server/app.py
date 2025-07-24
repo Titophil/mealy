@@ -30,12 +30,12 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # ✅ Allow all backend routes to be accessed from localhost:5173
-    CORS(app, origins="http://localhost:5174", supports_credentials=True)
+    # ✅ Allow all backend routes to be accessed from localhost:5174
+    CORS(app, origins="http://localhost:5173", supports_credentials=True)
 
     # Register routes
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(menu_bp, url_prefix='/menus')
+    app.register_blueprint(menu_bp, url_prefix='/api/menus')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(meal_bp, url_prefix='/api')

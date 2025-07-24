@@ -4,8 +4,11 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 import functools
 import requests
 import string
+from flask_cors import CORS
 
 meal_bp = Blueprint('meals', __name__)
+
+CORS(meal_bp)
 
 # -------------------- Auth Utility -------------------- #
 def caterer_required(fn):

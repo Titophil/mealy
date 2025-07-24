@@ -1,14 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import PublicLandingPage from './pages/PublicLandingPage';
-import SignupPage from './pages/SignupPage';
-import LoginPage from './pages/LoginPage';
-import UserDashboard from './pages/UserDashboard';
-import OrderHistory from './pages/OrderHistory';
+import PublicLandingPage from './pages/public/PublicLandingPage.jsx';
+import SignupPage from './pages/public/SignupPage.jsx';
+import LoginPage from './pages/public/LoginPage.jsx';
+import UserDashboard from './pages/user/UserDashboard.jsx';
+import OrderHistory from './pages/user/OrderHistory.jsx';
 import './App.css'; 
+import { AuthProvider } from './auth/AuthContext.jsx';
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <div className="app-container">
         <header className="navbar">
@@ -43,6 +45,7 @@ function App() {
         </footer>
       </div>
     </Router>
+    </AuthProvider>
   );
 }
 

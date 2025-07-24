@@ -25,9 +25,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    removeToken();
+    removeToken(); 
     setIsAuthenticated(false);
-    setUser(null);
+    setUser(null)
   };
 
   return (

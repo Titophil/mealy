@@ -1,10 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import './UserDashboard.css'; 
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate(); 
+  const handleLogout = () => {
+    logout();      
+    navigate('/'); 
+  };
 
   return (
     <div className="user-dashboard-page">
@@ -35,7 +40,7 @@ const UserDashboard = () => {
         </div>
 
         <div className="logout-section">
-          <button onClick={logout} className="logout-button">Logout</button>
+          <button onClick={handleLogout} className="logout-button">Logout</button>
         </div>
       </div>
     </div>

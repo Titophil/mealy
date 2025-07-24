@@ -510,3 +510,19 @@ p {
     width: 100%;
   }
 }
+
+.nav-logout-button {
+  background: none;
+  color: var(--primary-orange); 
+  padding: 0; 
+  box-shadow: none; 
+  font-size: 1rem; 
+  font-weight: 500; 
+  transition: color 0.3s ease;
+}
+
+.nav-logout-button:hover {
+  color: #e65a2e; 
+  transform: none; 
+  text-decoration: underline; 
+}

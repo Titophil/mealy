@@ -17,6 +17,7 @@ from .routes.auth_routes import auth_bp
 from .routes.user_routes import user_bp
 from .routes.Menu import menu_bp
 from .routes.meal_routes import meal_bp
+from .commands import seed
 
 def create_app():
     app = Flask(__name__)
@@ -41,6 +42,7 @@ def create_app():
     app.register_blueprint(meal_bp, url_prefix='/api')
     app.register_blueprint(payment_bp)
 
+    app.cli.add_command(seed)
     # Health check route
     @app.route("/")
     def home():

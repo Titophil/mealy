@@ -1,4 +1,6 @@
-/* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
 body {
   background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.8)),
               url('/src/assets/culinary.png');
@@ -50,4 +52,119 @@ body {
 
 .read-the-docs {
   color: #888;
+}
+
+
+:root {
+  --primary-orange: #FF6B3D; 
+  --light-orange: #FFB69B;   
+  --dark-text: #333333;      
+  --light-text: #FFFFFF;     
+  --background-light: #F8F8F8; 
+  --border-color: #E0E0E0;   
+  --shadow-color: rgba(0, 0, 0, 0.1); 
+
+  --font-family-primary: 'Poppins', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-primary);
+  line-height: 1.6;
+  color: var(--dark-text);
+  background-color: var(--background-light); 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+button {
+  background-color: var(--primary-orange);
+  color: var(--light-text);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+button:hover {
+  background-color: #e65a2e; 
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+ /* Form Inputs  */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: var(--font-family-primary);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.2);
+}
+
+/* Links */
+a {
+  color: var(--primary-orange);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #e65a2e;
+  text-decoration: underline;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--dark-text);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+p {
+  margin-bottom: 1rem;
 }

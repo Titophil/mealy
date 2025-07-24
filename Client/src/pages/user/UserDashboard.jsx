@@ -1,45 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import './UserDashboard.css'; 
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
 
   return (
-    <div>
-      <nav>
-        <h1>Mealy</h1>
-        <div>
-          <Link to="/user/dashboard">Dashboard</Link>
-          <Link to="/user/orders">Order History</Link>
-          <Link to="/menu">Today's Menu</Link>
-          <Link to="/order">Place Order</Link>
-          <button onClick={logout}>Logout</button>
+    <div className="user-dashboard-page">
+      <div className="container">
+        <div className="dashboard-header">
+          <h2>Hello, {user?.name || 'Mealy User'}!</h2>
+          <p className="subtitle">Welcome to your personalized Mealy dashboard. Here you can manage your meals and view your order history.</p>
         </div>
-      </nav>
 
-      <div>
-        <h2>Hello, {user?.name || 'Mealy User'}!</h2>
-        <p>Welcome to your personalized Mealy dashboard. Here you can manage your meals and view your order history.</p>
-
-        <div>
-          <div>
+        <div className="dashboard-actions-grid">
+          <div className="action-card">
             <h3>Your Orders</h3>
             <p>View all your past and current orders.</p>
-            <Link to="/user/orders">View Order History</Link>
+            <Link to="/user/orders" className="action-button">View Order History</Link>
           </div>
 
-          <div>
+          <div className="action-card">
             <h3>Today's Menu</h3>
             <p>Check out what delicious meals are available today.</p>
-            <Link to="/menu">See Menu</Link>
+            <Link to="/menu" className="action-button">See Menu</Link>
           </div>
 
-          <div>
+          <div className="action-card">
             <h3>Place an Order</h3>
             <p>Ready to order? Place your meal request for today.</p>
-            <Link to="/order">Order Now</Link>
+            <Link to="/order" className="action-button">Order Now</Link>
           </div>
+        </div>
+
+        <div className="logout-section">
+          <button onClick={logout} className="logout-button">Logout</button>
         </div>
       </div>
     </div>

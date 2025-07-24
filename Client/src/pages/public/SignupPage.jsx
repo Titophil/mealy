@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { signupUser } from '../../api/auth';
+import './SignupPage.css';
 
 const SignupPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();

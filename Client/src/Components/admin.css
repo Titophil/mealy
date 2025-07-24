@@ -293,7 +293,6 @@
   .external-meals-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: ;
     margin-top: 60px;
   }
   

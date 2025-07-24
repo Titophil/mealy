@@ -1,5 +1,3 @@
-# server/app.py
-
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -23,18 +21,20 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Optional Daraja config from .env
+    # Load Daraja credentials
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
     app.config['DARAJA_SHORTCODE'] = os.getenv('DARAJA_SHORTCODE')
 
-    # Initialize extensions
+    # Init extensions
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    CORS(app)
 
-    # Register Blueprints
+    # ✅ Allow all backend routes to be accessed from localhost:5173
+    CORS(app, origins="http://localhost:5173", supports_credentials=True)
+
+    # Register routes
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(menu_bp, url_prefix='/menus')
     app.register_blueprint(user_bp, url_prefix='/user')
@@ -42,15 +42,12 @@ def create_app():
     app.register_blueprint(meal_bp, url_prefix='/api')
     app.register_blueprint(payment_bp)
 
-    app.cli.add_command(seed)
-    # Health check route
     @app.route("/")
     def home():
         return jsonify(message="Welcome to the Mealy API 🚀"), 200
 
     return app
 
-# Create app instance
 app = create_app()
 
 if __name__ == '__main__':

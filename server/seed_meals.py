@@ -1,4 +1,3 @@
-
 import sys
 import os
 import random
@@ -14,13 +13,21 @@ from server.models.Menu_item import MenuItem
 from server.models.Order import Order
 from server.models.MealOption import MealOption
 from server.config import Config
-
 # Flask app setup
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
-# Image filenames
+# Actual meal names (matches number of image files)
+meal_names = [
+    "Grilled Chicken Pasta", "Sushi Platter", "Beef Steak", "Green Curry Chicken",
+    "Cheese Pizza", "Spaghetti Bolognese", "Vietnamese Pho", "Hyderabadi Biryani",
+    "Veggie Wrap", "Paneer Butter Masala", "Chicken Shawarma", "Roast Turkey",
+    "Fish and Chips", "Classic Burger", "Chicken Tikka", "Lasagna",
+    "Teriyaki Salmon", "Prawn Tempura", "French Toast", "Greek Salad",
+    "Caesar Salad", "Tandoori Chicken", "Mixed Grill Platter"
+]
+
 image_files = [
     "penne-pasta-tomato-sauce-with-chicken-tomatoes-wooden-table.jpg",
     "pexels-catscoming-674574.jpg",
@@ -74,12 +81,12 @@ def generate_meals():
             db.session.add(caterer)
             db.session.commit()
 
-        for i, filename in enumerate(image_files):
-            name = f"Meal {i + 1}"
+        for i in range(len(image_files)):
+            name = meal_names[i % len(meal_names)]
             category = categories[i % len(categories)]
             description = descriptions[i % len(descriptions)]
             price = round(random.uniform(150, 600), 2)
-            image_path = f"/static/images/meals/{filename}"
+            image_path = f"/images/meals/{image_files[i]}"  # Use /images for frontend (e.g., public folder in React)
 
             meal = MealOption(
                 name=name,

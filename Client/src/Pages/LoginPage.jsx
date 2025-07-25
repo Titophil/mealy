@@ -1,70 +1,68 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import { loginUser } from '../Api/Api'
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const { login } = useAuth();
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
-  const [loginError, setLoginError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setLoginError('');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
     try {
-      const response = await loginUser(data);
-      login(response.token, response.user);
-      navigate('/user/dashboard');
-    } catch (error) {
-      setLoginError(error);
-    } finally {
-      setLoading(false);
+      const response = await axios.post("http://127.0.0.1:5000/auth/login", {
+        email,
+        password,
+      });
+
+      const { token, role, user_id } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify({ id: user_id, role }));
+
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/customer");
+        }
+      } else {
+        setError("Unexpected server response");
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Login failed. Please try again.");
+      }
     }
   };
 
   return (
-    <div>
-      <div>
-        <h2>Welcome Back to Mealy!</h2>
-        <p>Log in to manage your orders.</p>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' } })}
-            />
-            {errors.email && <p>{errors.email.message}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              {...register('password', { required: 'Password is required' })}
-            />
-            {errors.password && <p>{errors.password.message}</p>}
-          </div>
-
-          {loginError && <p>{loginError}</p>}
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging In...' : 'Log In'}
-          </button>
-        </form>
-
-        <p>
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </p>
-      </div>
+    <div className="login-container">
+      <form onSubmit={handleLogin}>
+        <h2>Login</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Login</button>
+        {error && <p className="error">{error}</p>}
+      </form>
     </div>
   );
-};
-
-export default LoginPage;
+}

@@ -1,33 +1,37 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { setToken, getToken, removeToken } from './authUtils';
+import { jwtDecode } from 'jwt-decode'; // ✅ FIXED HERE
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    
     const token = getToken();
     if (token) {
-      
-      setIsAuthenticated(true);
-      
-      setUser({  });
+      try {
+        const decoded = jwtDecode(token);
+        setIsAuthenticated(true);
+        setUser(decoded); // Assumes your JWT contains fields like { id, role }
+      } catch (err) {
+        console.error("Invalid token:", err);
+        removeToken();
+      }
     }
   }, []);
 
   const login = (token, userData) => {
     setToken(token);
     setIsAuthenticated(true);
-    setUser(userData);
+    setUser(userData); // e.g., { id, role }
   };
 
   const logout = () => {
-    removeToken();
+    removeToken(); 
     setIsAuthenticated(false);
-    setUser(null);
+    setUser(null)
   };
 
   return (

@@ -1,0 +1,53 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  padding: 20px;
+  background-color: var(--background-light);
+}
+
+.login-card {
+  background-color: var(--light-text);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px var(--shadow-color);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.login-card h2 {
+  color: var(--primary-orange);
+  margin-bottom: 1.5rem;
+}
+
+.login-card .subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--dark-text);
+  font-size: 0.95rem;
+}
+
+.signup-link-text {
+  margin-top: 25px;
+  font-size: 0.95rem;
+  color: #555;
+}

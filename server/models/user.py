@@ -1,24 +1,32 @@
-from server.extensions import db
-from flask_bcrypt import Bcrypt
+
+from server.extensions import db, bcrypt
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
+from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 
-
-bcrypt = Bcrypt()
-
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='customer')
-    caterer_id = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    orders = db.relationship('Order', back_populates='user', lazy=True)
-    def __repr__(self):
-        return f'<User {self.email}>'
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-    
-    def check_password(self, password):
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
+    password_hash = Column(String(200), nullable=False)
+    role = Column(String(50), nullable=False, default='user')
+    created_at = Column(DateTime, server_default=db.func.now())
+
+    orders = relationship('Order', back_populates='user', cascade='all, delete-orphan')
+
+    @property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, value):
+        self.password_hash = bcrypt.generate_password_hash(value).decode('utf-8')
+
+    def authenticate(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<User {self.username}>'

@@ -5,4 +5,8 @@ from .caterer import Caterer
 from .payment import Payment
 from .Order import Order
 from .Menu import Menu
+<<<<<<< HEAD
 from .Menu_item import MenuItem
+=======
+from .user import User
+>>>>>>> origin/master

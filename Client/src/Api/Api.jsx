@@ -1,4 +1,3 @@
-// File: src/Api/Api.jsx
 import axios from 'axios';
 
 const api = axios.create({
@@ -13,8 +12,6 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
-
-export default api;
 
 // -------- AUTH --------
 export const loginUser = (credentials) => api.post('/auth/login', credentials);
@@ -37,9 +34,4 @@ export const createMeal = (mealData) => api.post('/meals', mealData);
 export const updateMeal = (id, mealData) => api.put(`/meals/${id}`, mealData);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`);
 
-// -------- EXTERNAL MEALS --------
-export const fetchAllExternalMeals = () => api.get('/meals/external');
-export const searchExternalMeals = (query) => api.get(`/meals/external/search?q=${query}`);
-
-// -------- SPOONACULAR MEALS --------
-export const fetchSpoonacularMeals = () => api.get('/meals/spoonacular');
+export default api;

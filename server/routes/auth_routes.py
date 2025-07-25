@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from server.models.user import User
 from server.extensions import db, bcrypt
 from flask_jwt_extended import create_access_token
-from werkzeug.security import check_password_hash
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
@@ -32,7 +31,7 @@ def signup():
 
     try:
         user = User(email=email, name=name, role=role)
-        user.set_password(password)
+        user.password = password  # ✅ Using the property setter
 
         db.session.add(user)
         db.session.commit()
@@ -69,7 +68,7 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user or not user.check_password(password):
+    if not user or not user.authenticate(password):  # ✅ uses model's authenticate method
         return jsonify({'error': 'Invalid email or password'}), 401
 
     access_token = create_access_token(identity=user.id)

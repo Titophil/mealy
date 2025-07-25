@@ -1,12 +1,3 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
-
-# Local imports
 from .config import Config
 from .extensions import db, migrate, jwt
 from .routes.admin_routes import admin_bp
@@ -16,6 +7,16 @@ from .routes.user_routes import user_bp
 from .routes.Menu import menu_bp
 from .routes.meal_routes import meal_bp
 from .commands import seed
+
+from flask import Flask, jsonify
+from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
+
+# Local imports
 
 def create_app():
     app = Flask(__name__)

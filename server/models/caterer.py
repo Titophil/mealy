@@ -1,7 +1,8 @@
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Column, Integer, String, Float, DateTime
+
+from server.extensions import db, bcrypt
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy_serializer import SerializerMixin
-from server.extensions import bcrypt, db
 
 class Caterer(db.Model, SerializerMixin):
     __tablename__ = 'caterers'
@@ -13,24 +14,11 @@ class Caterer(db.Model, SerializerMixin):
     password_hash = Column(String(200), nullable=False)
     created_at = Column(DateTime, server_default=db.func.now())
 
-    # Relationships
-    meal_options = db.relationship(
-        'MealOption',
-        backref='caterer',
-        cascade='all, delete-orphan'
-    )
-    orders = db.relationship(
-        'Order',
-        backref='caterer',
-        cascade='all, delete-orphan'
-    )
-    menus = db.relationship(
-        'Menu',
-        backref='caterer',
-        cascade='all, delete-orphan'
-    )
+    meal_options = relationship('MealOption', back_populates='caterer', cascade='all, delete-orphan')
+    orders = relationship('Order', back_populates='caterer', cascade='all, delete-orphan')
+    menus = relationship('Menu', back_populates='caterer', cascade='all, delete-orphan')
 
-    @hybrid_property
+    @property
     def password(self):
         raise AttributeError("Password is write-only.")
 

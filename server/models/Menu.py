@@ -1,13 +1,26 @@
+
 from server.extensions import db
-
-
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 
 class Menu(db.Model):
-    __tablename__ ='menus'
+    __tablename__ = 'menus'
 
-    id = db.Column(db.Integer,primary_key=True)
-    menu_date=db.Column(db.Date,nullable=False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    menu_date = Column(DateTime, nullable=False)
+    caterer_id = Column(Integer, ForeignKey('caterers.id'), nullable=True)
 
+    items = relationship('MenuItem', back_populates='menu', cascade='all, delete-orphan')
+    caterer = relationship('Caterer', back_populates='menus')
 
-    items= db.relationship('MenuItem', back_populates='menu',cascade='all, delete-orphan')
-    caterer_id = db.Column(db.Integer, db.ForeignKey('caterers.id'), nullable=False)
+    def __repr__(self):
+        return f"<Menu {self.name}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "menu_date": self.menu_date.isoformat() if self.menu_date else None,
+            "caterer_id": self.caterer_id
+        }

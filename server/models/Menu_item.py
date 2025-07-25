@@ -1,18 +1,27 @@
+
 from server.extensions import db
-from sqlalchemy import ForeignKey
-
-
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 class MenuItem(db.Model):
-    __tablename__ ='menu_items'
+    __tablename__ = 'menu_items'
 
-    id = db.Column(db.Integer,primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    menu_id=db.Column(db.Integer,ForeignKey('menus.id'),nullable=False)
-    orders = db.relationship('Order', back_populates='menu_item')
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    menu_id = Column(Integer, ForeignKey('menus.id'), nullable=False)
+    meal_option_id = Column(Integer, ForeignKey('meal_options.id'), nullable=True)
 
+    menu = relationship('Menu', back_populates='items')
+    meal_option = relationship('MealOption', back_populates='menu_items')
+    orders = relationship('Order', back_populates='menu_item', cascade='all, delete-orphan')
 
+    def __repr__(self):
+        return f"<MenuItem {self.name}>"
 
-    menu = db.relationship('Menu', back_populates='items')
-    
-
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "meal_option_id": self.meal_option_id,
+            "menu_id": self.menu_id
+        }

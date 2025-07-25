@@ -1,15 +1,18 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { fetchAllExternalMeals } from '../Api/Api.jsx'; // Adjust path if needed
+import { fetchMeals } from '../Api/Api'; // Adjusted to import fetchMeals
+import { createMeal } from '../Api/Api'; // Adjusted to import createMeal
+
 
 export const MealContext = createContext();
 
 export const MealProvider = ({ children }) => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch meals from external API
+  // Fetch seeded meals from internal API
   useEffect(() => {
-    fetchAllExternalMeals()
+    fetchMeals()
       .then((response) => {
         const data = response.data ?? [];
         if (Array.isArray(data)) {
@@ -21,6 +24,7 @@ export const MealProvider = ({ children }) => {
       })
       .catch((err) => {
         console.error("Failed to fetch meals:", err);
+        setError("Failed to load meals.");
         setMeals([]);
       })
       .finally(() => {
@@ -28,21 +32,23 @@ export const MealProvider = ({ children }) => {
       });
   }, []);
 
-  // Add a new meal (optional if using only external API)
-  const addMeal = (meal) => {
-    const newMeal = {
-      ...meal,
-      idMeal:
-        meals.length > 0
-          ? String(Number(meals[meals.length - 1].idMeal || meals.length) + 1)
-          : '1',
-    };
-    setMeals((prevMeals) => [...prevMeals, newMeal]);
+  // Add a new meal (optional, for internal API usage)
+  const addMeal = async (mealData) => {
+    try {
+      const response = await createMeal(mealData);
+      const newMeal = response.data;
+      setMeals((prevMeals) => [...prevMeals, newMeal]);
+    } catch (err) {
+      console.error("Failed to add meal:", err);
+      setError("Failed to add meal.");
+    }
   };
 
   return (
-    <MealContext.Provider value={{ meals, addMeal, loading }}>
+    <MealContext.Provider value={{ meals, addMeal, loading, error }}>
       {children}
     </MealContext.Provider>
   );
 };
+
+export default MealProvider;

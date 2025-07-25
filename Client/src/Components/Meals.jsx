@@ -1,97 +1,82 @@
-// File: src/Components/Meals.jsx
-import React, { useEffect, useState } from 'react';
-import api from '../Api/Api'; // ✅ corrected path
+import React, { useContext, useState } from 'react';
+import { MealContext } from './MealContext';
+import api from '../Api/Api';
+import "./admin.css";
 
 const Meals = () => {
-  const [meals, setMeals] = useState([]);
-  const [externalMeals, setExternalMeals] = useState([]);
-  const [spoonacularMeals, setSpoonacularMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [source, setSource] = useState('internal');
+  const { meals, loading, error } = useContext(MealContext);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [menuDate, setMenuDate] = useState('');
+  const [message, setMessage] = useState('');
 
-  const fetchInternalMeals = async () => {
+  const handleAddToMenu = (name) => {
+    if (!selectedItems.includes(name)) {
+      setSelectedItems([...selectedItems, name]);
+    }
+  };
+
+  const handleSubmitMenu = async () => {
+    if (!menuDate) return setMessage("Please provide a menu date (YYYY-MM-DD)");
+
     try {
-      const response = await api.get('/meals');
-      setMeals(response.data);
+      await api.post('/menus', {
+        menu_date: menuDate,
+        items: selectedItems
+      });
+      setMessage("✅ Menu created successfully");
+      setSelectedItems([]);
     } catch (err) {
-      setError("Failed to load internal meals.");
+      setMessage("❌ Failed to create menu: " + (err.response?.data?.error || err.message));
     }
-  };
-
-  const fetchExternalMeals = async () => {
-    try {
-      const response = await api.get('/meals/external');
-      setExternalMeals(response.data);
-    } catch (err) {
-      setError("Failed to load external meals.");
-    }
-  };
-
-  const fetchSpoonacular = async () => {
-    try {
-      const res = await api.get('/meals/spoonacular');
-      setSpoonacularMeals(res.data);
-    } catch {
-      setError("Failed to fetch Spoonacular meals.");
-    }
-  };
-
-  const handleSourceChange = async (type) => {
-    setSource(type);
-    if (type === 'external' && externalMeals.length === 0) await fetchExternalMeals();
-    if (type === 'spoonacular' && spoonacularMeals.length === 0) await fetchSpoonacular();
-  };
-
-  useEffect(() => {
-    fetchInternalMeals().finally(() => setLoading(false));
-  }, []);
-
-  let data = meals;
-  if (source === 'external') data = externalMeals;
-  if (source === 'spoonacular') data = spoonacularMeals;
-
-  const cardStyle = {
-    border: '1px solid #ccc',
-    padding: '1rem',
-    marginBottom: '1rem',
-    borderRadius: '8px'
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>{
-        source === 'internal' ? 'Internal Meals' :
-        source === 'external' ? 'External Meals (TheMealDB)' :
-        'Spoonacular Meals'
-      }</h2>
+    <div className="meals-container">
+      <h2 className="meals-title">Available Meals</h2>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <button onClick={() => handleSourceChange('internal')}>Internal</button>
-        <button onClick={() => handleSourceChange('external')}>TheMealDB</button>
-        <button onClick={() => handleSourceChange('spoonacular')}>Spoonacular</button>
+      <div className="menu-form">
+        <input
+          type="date"
+          className="date-input"
+          value={menuDate}
+          onChange={(e) => setMenuDate(e.target.value)}
+        />
+        <button className="submit-button" onClick={handleSubmitMenu}>
+          Submit Menu
+        </button>
+        {message && (
+          <p className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
+            {message}
+          </p>
+        )}
       </div>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <p className="loading">Loading...</p>}
+      {error && <p className="error">{error}</p>}
 
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {data.map((meal) => (
-          <li key={meal.idMeal || meal.id} style={cardStyle}>
-            <h3>{meal.strMeal || meal.name || meal.title}</h3>
-            {(meal.strMealThumb || meal.image) && (
+      <ul className="meal-list">
+        {meals.map((meal) => {
+          const isAdded = selectedItems.includes(meal.name);
+          return (
+            <li key={meal.id} className="meal-card">
               <img
-                src={meal.strMealThumb || meal.image}
-                alt={meal.strMeal || meal.title}
-                width="100"
+                src={meal.image}
+                alt={meal.name}
+                className="meal-image"
               />
-            )}
-            <p><strong>Category:</strong> {meal.strCategory || 'N/A'}</p>
-            <p><strong>Area:</strong> {meal.strArea || 'N/A'}</p>
-            <p><strong>Description:</strong> {meal.description || 'No description'}</p>
-            <p><strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : 'N/A'}</p>
-          </li>
-        ))}
+              <h3 className="meal-name">{meal.name}</h3>
+              <p className="meal-desc"><strong>Description:</strong> {meal.description || 'No description'}</p>
+              <p className="meal-price"><strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : 'N/A'}</p>
+              <button
+                className={`add-button ${isAdded ? 'added' : ''}`}
+                onClick={() => handleAddToMenu(meal.name)}
+                disabled={isAdded}
+              >
+                {isAdded ? '✓ Added' : 'Add to Menu'}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

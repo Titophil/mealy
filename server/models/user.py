@@ -1,17 +1,32 @@
+
 from server.extensions import db, bcrypt
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
+from sqlalchemy_serializer import SerializerMixin
+from datetime import datetime
 
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    name = db.Column(db.String(100), nullable=True)
-    role = db.Column(db.String(20), nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
 
-    orders = db.relationship('Order', back_populates='user')  # Keep this for Order relationship
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
+    password_hash = Column(String(200), nullable=False)
+    role = Column(String(50), nullable=False, default='user')
+    created_at = Column(DateTime, server_default=db.func.now())
 
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    orders = relationship('Order', back_populates='user', cascade='all, delete-orphan')
 
-    def check_password(self, password):
+    @property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, value):
+        self.password_hash = bcrypt.generate_password_hash(value).decode('utf-8')
+
+    def authenticate(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<User {self.username}>'

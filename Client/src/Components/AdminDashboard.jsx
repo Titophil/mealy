@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import api from '../Api/Api';
+import axios from "axios";
 import "./admin.css";
 
 

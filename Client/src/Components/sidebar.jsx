@@ -32,14 +32,7 @@ export default function Sidebar() {
               Meals
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/admin/meals/add"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Add Meal
-            </NavLink>
-          </li>
+         
           <li>
             <NavLink
               to="/admin/revenue"
@@ -48,14 +41,7 @@ export default function Sidebar() {
               Revenue
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/admin/menu-builder"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Menu Builder
-            </NavLink>
-          </li>
+         
           <li>
             <NavLink
               to="/admin/menu-viewer"

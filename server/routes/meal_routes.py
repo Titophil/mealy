@@ -5,15 +5,15 @@ from server.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import functools
 
-meal_bp = Blueprint('meals', __name__)  # Fixed 'name' to '__name__'
+meal_bp = Blueprint('meals', __name__)
 
 def caterer_required(fn):
     @functools.wraps(fn)
-    def wrapper(*args, **kwargs):  # Fixed wrong 'args'
+    def wrapper(*args, **kwargs):
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
-        if not user or user.role != 'caterer':
-            return jsonify({"error": "Caterer access required"}), 403
+        if not user or user.role != 'admin':
+            return jsonify({"error": "Admin access required"}), 403
         return fn(*args, **kwargs)
     return wrapper
 
@@ -45,7 +45,15 @@ def create_meal():
     )
     db.session.add(meal)
     db.session.commit()
-    return jsonify(message="Meal created", id=meal.id), 201
+    # Return the created meal object
+    return jsonify({
+        "id": meal.id,
+        "name": meal.name,
+        "description": meal.description,
+        "price": meal.price,
+        "image": meal.image,
+        "caterer_id": meal.caterer_id
+    }), 201
 
 @meal_bp.route('/<int:id>', methods=['PUT', 'DELETE'])
 @jwt_required()
@@ -54,7 +62,7 @@ def update_or_delete_meal(id):
     meal = MealOption.query.get_or_404(id)
 
     if meal.caterer_id != get_jwt_identity():
-        return jsonify(error="Not allowed"), 403
+        return jsonify({"error": "Not allowed"}), 403
 
     if request.method == 'PUT':
         data = request.get_json()
@@ -63,9 +71,17 @@ def update_or_delete_meal(id):
         meal.price = data.get('price', meal.price)
         meal.image = data.get('image', meal.image)
         db.session.commit()
-        return jsonify(message="Meal updated"), 200
+        # Return the updated meal object
+        return jsonify({
+            "id": meal.id,
+            "name": meal.name,
+            "description": meal.description,
+            "price": meal.price,
+            "image": meal.image,
+            "caterer_id": meal.caterer_id
+        }), 200
 
     elif request.method == 'DELETE':
         db.session.delete(meal)
         db.session.commit()
-        return jsonify(message="Meal deleted"), 200
+        return jsonify({"message": "Meal deleted"}), 200

@@ -41,7 +41,7 @@ const AppRoutes = () => {
     <Route path="overview" element={<Overview />} />
     <Route path="orders" element={<OrdersCard />} />
     <Route path="meals" element={<Meals />} />
-    <Route path="meals/add" element={<MealForm />} />
+   
     <Route path="revenue" element={<Revenue />} />
     <Route path="menu-viewer" element={<Menuviewer />} />
   </Route>
@@ -50,8 +50,10 @@ const AppRoutes = () => {
   <Route element={<PrivateRoute />}>
     <Route path="/user/dashboard" element={<UserDashboard />} />
     <Route path="/user/orders" element={<OrderHistory />} />
+    <Route path="/user/menu-viewer" element={<Menuviewer />} />
     <Route path="/order" element={<OrderForm />} />
     <Route path="/order/current" element={<TodaysOrder />} />
+    
   </Route>
 
   {/* 404 Fallback */}

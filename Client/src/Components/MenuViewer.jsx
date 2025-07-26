@@ -20,6 +20,13 @@ function MenuViewer() {
       });
   };
 
+  const handleOrder = (mealName) => {
+    // Placeholder function - replace with your order logic
+    console.log(`Order placed for: ${mealName}`);
+    // Example: You could call an API or navigate to an order page
+    // e.g., api.post('/orders', { meal_name: mealName, menu_date: selectedDate });
+  };
+
   useEffect(() => {
     fetchMenu(selectedDate);
   }, [selectedDate]);
@@ -50,26 +57,36 @@ function MenuViewer() {
             Menu for {menu.menu_date}
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="meal-list">
             {menu.items.map((meal, index) => (
               <div
                 key={index}
-                className="border rounded-lg shadow p-4 bg-white hover:shadow-lg transition"
+                className="meal-card"
               >
-                {meal.image_url ? (
+                {meal.image? (
                   <img
-                    src={meal.image_url}
+                    src={meal.image}
                     alt={meal.name}
-                    className="w-full h-40 object-cover rounded"
+                    className="meal-image"
                   />
                 ) : (
                   <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
                     No Image
                   </div>
                 )}
-                <h3 className="mt-3 text-lg font-semibold">{meal.name}</h3>
-                <p className="text-gray-600 text-sm">{meal.description}</p>
-                <p className="text-green-700 font-bold mt-1">Ksh {meal.price}</p>
+                <h3 className="meal-name">{meal.name}</h3>
+                <p className="meal-desc">
+                  <strong>Description:</strong> {meal.description || 'No description'}
+                </p>
+                <p className="meal-price">
+                  <strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : 'N/A'}
+                </p>
+                <button
+                  className="add-button" /* Reuse the existing button style */
+                  onClick={() => handleOrder(meal.name)}
+                >
+                  Order
+                </button>
               </div>
             ))}
           </div>

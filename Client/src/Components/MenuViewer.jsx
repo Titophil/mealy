@@ -33,7 +33,7 @@ function MenuViewer() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">🍽️ Menu Viewer</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">🍽️ Menu</h2>
 
       {/* 📅 Date Picker */}
       <div className="flex justify-center mb-6">

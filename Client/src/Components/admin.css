@@ -1,5 +1,11 @@
 
-
+body{
+   margin-left: 200px; /* Same as sidebar width */
+  padding: 20px;
+  background-color: #222; /* dark bg as in screenshot */
+  min-height: 100vh;
+  color: white;
+}
 .dashboard-section {
     margin-bottom: 2rem;
   }
@@ -68,8 +74,9 @@
     padding: 2rem 1rem;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     margin-top: 80px;
-    z-index: 0;
+    z-index: 1000;
     border-radius: 10px;
+    
   }
    .sidebar h2 {
     margin-bottom: 2rem;

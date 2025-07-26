@@ -23,5 +23,8 @@ class MenuItem(db.Model):
             "id": self.id,
             "name": self.name,
             "meal_option_id": self.meal_option_id,
-            "menu_id": self.menu_id
+            "menu_id": self.menu_id,
+            "image_url": self.meal_option.image if self.meal_option else None,
+            "description": self.meal_option.description if self.meal_option else "",
+            "price": self.meal_option.price if self.meal_option else None
         }

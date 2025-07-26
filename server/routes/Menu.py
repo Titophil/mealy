@@ -7,6 +7,19 @@ from datetime import datetime
 
 menu_bp = Blueprint('menu_bp', __name__)  # ✅ corrected `name` to `__name__`
 
+@menu_bp.route('', methods=['GET'])
+def get_all_menus():
+    menus = Menu.query.all()
+    return jsonify([
+        {
+            "id": menu.id,
+            "menu_date": menu.menu_date.isoformat(),
+            "items": [item.meal_option.to_dict() for item in menu.items]
+        } for menu in menus
+    ]), 200
+
+
+
 @menu_bp.route('/today', methods=['GET'])
 def get_today_menu():
     today = datetime.utcnow().date()
@@ -18,6 +31,26 @@ def get_today_menu():
         "menu_date": menu.menu_date.isoformat(),
         "items": [item.to_dict() for item in menu.items]
     }), 200
+
+
+@menu_bp.route('/<string:date_str>', methods=['GET'])
+def get_menu_by_date(date_str):
+    try:
+        query_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    menu = Menu.query.filter(db.func.date(Menu.menu_date) == query_date).first()
+
+    if not menu:
+        return jsonify({"message": "No menu found"}), 404
+
+    return jsonify({
+        "id": menu.id,
+        "menu_date": menu.menu_date.isoformat(),
+        "items": [item.meal_option.to_dict() for item in menu.items]
+    }), 200
+
 
 @menu_bp.route('', methods=['POST'])
 def create_menu():

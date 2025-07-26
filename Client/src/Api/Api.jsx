@@ -26,6 +26,7 @@ export const fetchUserOrders = () => api.get('/users/orders');
 
 // -------- MENU --------
 export const fetchTodayMenu = () => api.get('/menus/today');
+export const getMenuByDate = (date) => api.get(`/menus/${date}`);
 export const updateMenuItemStatus = (menuId, items) =>
   api.put(`/menus/${menuId}/update`, { items });
 

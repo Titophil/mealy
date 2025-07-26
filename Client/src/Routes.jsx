@@ -15,6 +15,7 @@ import OrdersCard from "./Components/OrdersCard";
 import Revenue from "./Components/Revenue";
 import Meals from "./Components/Meals";
 import MealForm from "./Components/MealForm";
+import Menuviewer from "./Components/MenuViewer";
 
 // User + Order pages
 import OrderForm from "./Pages/OrderForm";
@@ -42,6 +43,7 @@ const AppRoutes = () => {
     <Route path="meals" element={<Meals />} />
     <Route path="meals/add" element={<MealForm />} />
     <Route path="revenue" element={<Revenue />} />
+    <Route path="menu-viewer" element={<Menuviewer />} />
   </Route>
 
   {/* User Private Routes */}

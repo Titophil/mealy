@@ -3,7 +3,6 @@ from server.models.user import User
 from server.models.MealOption import MealOption
 from server.models.caterer import Caterer
 from server.extensions import db
-from flask_jwt_extended import jwt_required, get_jwt_identity
 import logging
 
 meal_bp = Blueprint('meals', __name__)
@@ -23,15 +22,13 @@ def get_meals():
     ]), 200
 
 @meal_bp.route('', methods=['POST'])
-@jwt_required()
 def create_meal():
     data = request.get_json()
     if not data or 'name' not in data or 'price' not in data:
         return jsonify({"error": "Name and price are required"}), 400
-    caterer_id = get_jwt_identity()
+    caterer_id = 1  # Default caterer_id; adjust as needed
     caterer = Caterer.query.get(caterer_id)
     if not caterer:
-        # Automatically create a caterer if not exists (minimal setup)
         try:
             caterer = Caterer(
                 id=caterer_id,
@@ -41,7 +38,7 @@ def create_meal():
                 password_hash=bcrypt.generate_password_hash("default_password").decode('utf-8')
             )
             db.session.add(caterer)
-            db.session.flush()  # Ensure caterer_id is available
+            db.session.flush()
             logging.info(f"Created caterer {caterer_id} automatically")
         except Exception as e:
             db.session.rollback()
@@ -51,7 +48,7 @@ def create_meal():
         meal = MealOption(
             name=data['name'],
             description=data.get('description', ''),
-            price=float(data['price']),  # Convert to float
+            price=float(data['price']),
             image=data.get('image', ''),
             caterer_id=caterer_id
         )
@@ -75,14 +72,10 @@ def create_meal():
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 @meal_bp.route('/<int:id>', methods=['PUT', 'DELETE'])
-@jwt_required()
 def update_or_delete_meal(id):
     meal = MealOption.query.get(id)
     if not meal:
         return jsonify({"error": "Meal not found"}), 404
-    caterer_id = get_jwt_identity()
-    if meal.caterer_id != caterer_id:
-        return jsonify({"error": "Unauthorized to modify this meal"}), 403
 
     if request.method == 'PUT':
         data = request.get_json()
@@ -94,7 +87,7 @@ def update_or_delete_meal(id):
             meal.price = float(data.get('price', meal.price))
             meal.image = data.get('image', meal.image)
             db.session.commit()
-            logging.info(f"Updated meal {meal.id} for caterer {caterer_id}")
+            logging.info(f"Updated meal {meal.id}")
             return jsonify({
                 "id": meal.id,
                 "name": meal.name,
@@ -114,7 +107,7 @@ def update_or_delete_meal(id):
         try:
             db.session.delete(meal)
             db.session.commit()
-            logging.info(f"Deleted meal {id} for caterer {caterer_id}")
+            logging.info(f"Deleted meal {id}")
             return jsonify({"message": "Meal deleted"}), 200
         except Exception as e:
             db.session.rollback()

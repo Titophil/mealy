@@ -18,12 +18,11 @@ const SignupPage = () => {
       const response = await signupUser(data);
       login(response.token, response.user);
 
-      // Redirect based on email
       const isAdminEmail = data.email.endsWith('.admin@gmail.com');
       if (isAdminEmail) {
         navigate('/admin');
       } else {
-        navigate('/user/dashboard');
+        navigate('/login');
       }
 
     } catch (error) {

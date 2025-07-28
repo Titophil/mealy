@@ -1,7 +1,11 @@
 from functools import wraps
 from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+<<<<<<< HEAD
 from .models.user import User  # Adjust if your user model is elsewhere
+=======
+from models.user import User  
+>>>>>>> origin/neema
 
 def login_required(f):
     @wraps(f)
@@ -13,7 +17,7 @@ def login_required(f):
             if not user:
                 return jsonify({'message': 'User not found'}), 404
 
-            request.user = user  # attach user object to request
+            request.user = user  
             return f(*args, **kwargs)
         except Exception as e:
             return jsonify({'message': str(e)}), 401

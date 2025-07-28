@@ -10,10 +10,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from server.extensions import db
 from server.models.caterer import Caterer
 from server.models.Menu import Menu
-from server.models.Menu_item import Menu_item
+from server.models.Menu_item import MenuItem  # if class is MenuItem
 from server.models.Order import Order
 from server.models.MealOption import MealOption
-from server.models.User import User
+from server.models.user import User
 from server.config import Config
 
 # Flask app setup
@@ -79,9 +79,9 @@ def generate_meals():
         print("👤 Ensuring default user exists...")
         user = User(
             id=17,  # Match JWT sub
-            username="testuser",
+            name="testuser",
             email="testuser@example.com",
-            phone="254712345678"
+            
         )
         user.password = "testpassword"
         db.session.add(user)

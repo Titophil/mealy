@@ -39,10 +39,24 @@ function MenuViewer() {
     async (meal) => {
       if (loadingPayment) return;
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+      let userId = null;
+
+      try {
+        userId = user ? JSON.parse(user).id : null;
+      } catch (e) {
+        console.error("Failed to parse user from localStorage.");
+      }
+
       if (!token) {
         setPaymentStatus("❌ Please log in to place an order.");
-        navigate('/login');
+        navigate("/login");
+        return;
+      }
+
+      if (!userId) {
+        setPaymentStatus("❌ User information missing.");
         return;
       }
 
@@ -53,18 +67,17 @@ function MenuViewer() {
         return;
       }
 
-      const normalizedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone;
-      if (!normalizedPhone.match(/^2547\d{8}$/)) {
+      const normalizedPhone = phone.startsWith("0") ? `254${phone.slice(1)}` : phone;
+      if (!/^2547\d{8}$/.test(normalizedPhone)) {
         setPaymentStatus("❌ Invalid phone number format.");
         return;
       }
 
       const amount = meal.price || 100;
       const foodName = meal.name;
-      const menuItemId = meal.id;
+      const menuItemId = meal.menu_item_id || meal.id;
 
       if (!menuItemId) {
-        console.error("Invalid menu item ID:", meal);
         setPaymentStatus("❌ Invalid menu item selected.");
         return;
       }
@@ -72,17 +85,31 @@ function MenuViewer() {
       try {
         setLoadingPayment(true);
         setPaymentStatus("");
-        console.log("Initiating payment:", { phone: normalizedPhone, amount, foodName, customerName, menuItemId });
+        console.log("Initiating payment:", {
+          phone: normalizedPhone,
+          amount,
+          foodName,
+          customerName,
+          menuItemId,
+        });
+
         const res = await axios.post(
           "http://localhost:5000/payments/api/payment/initiate",
-          { phone: normalizedPhone, amount, food_name: foodName, customer_name: customerName, menu_item_id: menuItemId },
-          { 
-            headers: { 'Authorization': `Bearer ${token}` },
-            timeout: 15000 
+          {
+            phone: normalizedPhone,
+            amount,
+            food_name: foodName,
+            customer_name: customerName,
+            menu_item_id: menuItemId,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: 15000,
           }
         );
 
-        console.log("STK Push Response:", JSON.stringify(res.data, null, 2));
+        console.log("STK Push Response:", res.data);
+
         if (
           res.data?.message === "STK push initiated successfully" &&
           res.data?.response?.ResponseCode === "0"
@@ -91,15 +118,20 @@ function MenuViewer() {
           try {
             const orderRes = await axios.post(
               "http://localhost:5000/orders",
-              { menu_item_id: menuItemId },
-              { headers: { 'Authorization': `Bearer ${token}` } }
+              { menu_item_id: menuItemId, user_id: userId },
+              { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log("Order created:", orderRes.data);
           } catch (orderErr) {
             console.error("Order creation error:", orderErr.response?.data || orderErr.message);
-            setPaymentStatus(`❌ Payment initiated, but order creation failed: ${orderErr.response?.data?.error || orderErr.message}`);
+            setPaymentStatus(
+              `❌ Payment initiated, but order creation failed: ${
+                orderErr.response?.data?.error || orderErr.message
+              }`
+            );
             return;
           }
+
           setTimeout(() => {
             navigate("/user/orders", { replace: true });
           }, 8000);
@@ -109,7 +141,6 @@ function MenuViewer() {
             res.data?.response?.ResponseDescription ||
             "Failed to initiate STK Push";
           setPaymentStatus(`❌ Payment failed: ${errorMsg}`);
-          console.log("Error details:", { errorMsg, response: res.data });
         }
       } catch (err) {
         console.error("Payment error:", {
@@ -155,26 +186,29 @@ function MenuViewer() {
             Menu for {menu.menu_date}
           </h3>
 
-          <div className="meal-list">
+          <div className="meal-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menu.items.map((meal, index) => (
-              <div key={index} className="meal-card">
+              <div key={index} className="meal-card p-4 border rounded-lg shadow">
                 {meal.image ? (
-                  <img src={meal.image} alt={meal.name} className="meal-image" />
+                  <img
+                    src={meal.image}
+                    alt={meal.name}
+                    className="meal-image w-full h-40 object-cover rounded"
+                  />
                 ) : (
                   <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
                     No Image
                   </div>
                 )}
-                <h3 className="meal-name">{meal.name}</h3>
-                <p className="meal-desc">
+                <h3 className="meal-name text-lg font-bold mt-2">{meal.name}</h3>
+                <p className="meal-desc text-sm mt-1">
                   <strong>Description:</strong> {meal.description || "No description"}
                 </p>
-                <p className="meal-price">
-                  <strong>Price:</strong>{" "}
-                  {meal.price ? `KSh ${meal.price}` : "N/A"}
+                <p className="meal-price mt-1">
+                  <strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : "N/A"}
                 </p>
                 <button
-                  className="add-button"
+                  className="add-button mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
                   onClick={() => debouncedHandleOrder(meal)}
                   disabled={loadingPayment}
                 >
@@ -187,9 +221,7 @@ function MenuViewer() {
       )}
 
       {paymentStatus && (
-        <p className="text-center mt-6 font-medium text-blue-600">
-          {paymentStatus}
-        </p>
+        <p className="text-center mt-6 font-medium text-blue-600">{paymentStatus}</p>
       )}
     </div>
   );

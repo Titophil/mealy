@@ -1,4 +1,3 @@
-
 from server.extensions import db
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
@@ -20,7 +19,8 @@ class MenuItem(db.Model):
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": self.id,  # optional, for general use
+            "menu_item_id": self.id,  # explicit for order referencing
             "name": self.name,
             "meal_option_id": self.meal_option_id,
             "menu_id": self.menu_id,

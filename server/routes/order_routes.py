@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_cors import cross_origin
 from server.models import db, Order, MealOption, User
 import logging
@@ -18,17 +17,16 @@ def create_order():
         logger.debug("Handling OPTIONS request for /orders")
         return jsonify({}), 200
 
-    @jwt_required()
     def handle_post():
         try:
             data = request.get_json()
             menu_item_id = data.get('menu_item_id')
-            user_id = get_jwt_identity()
+            user_id = data.get('user_id')  # Now expecting user_id directly in request body
             logger.debug(f"Creating order for user_id: {user_id}, menu_item_id: {menu_item_id}")
 
-            if not menu_item_id:
-                logger.warning("Missing menu_item_id in request")
-                return jsonify({"error": "menu_item_id is required"}), 400
+            if not menu_item_id or not user_id:
+                logger.warning("Missing menu_item_id or user_id in request")
+                return jsonify({"error": "menu_item_id and user_id are required"}), 400
 
             meal_option = MealOption.query.get(menu_item_id)
             if not meal_option:
@@ -54,10 +52,12 @@ def get_user_order_details():
         logger.debug("Handling OPTIONS request for /orders/user/details")
         return jsonify({}), 200
 
-    @jwt_required()
     def handle_get():
         try:
-            user_id = get_jwt_identity()
+            user_id = request.args.get('user_id')
+            if not user_id:
+                return jsonify({"error": "user_id query parameter is required"}), 400
+
             logger.debug(f"Fetching orders for user_id: {user_id}")
             orders_menu_items = (
                 db.session.query(Order, MealOption)

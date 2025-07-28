@@ -53,7 +53,7 @@ const AppRoutes = () => {
     <Route path="/user/menu-viewer" element={<Menuviewer />} />
     <Route path="/order" element={<OrderForm />} />
     <Route path="/order/current" element={<TodaysOrder />} />
-    
+    <Route path="/menu" element={<Menuviewer />} />
   </Route>
 
   <Route element={<PrivateRoute />}>

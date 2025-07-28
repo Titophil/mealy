@@ -1,38 +1,56 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { placeOrder } from '../Api/Api'; // ✅ Ensure correct path
-import OrderSuccessModal from '../Components/OrderSuccessModal'; // ✅ Ensure correct path
-import { useAuth } from '../auth/AuthContext'; // ✅ Ensure correct path
+import { placeOrder } from '../Api/Api';
+import OrderSuccessModal from '../Components/OrderSuccessModal';
+import { useAuth } from '../auth/AuthContext';
 
 const OrderForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const onSubmit = async (data) => {
+    if (!user) return;
+
     setLoading(true);
+    setSubmitError('');
     try {
       const payload = {
-        menu_item_id: data.menuItemId, // ✅ match backend expected key
-        quantity: Number(data.quantity), // ✅ convert to number if backend expects it
+        menu_item_id: data.menuItemId,
+        quantity: Number(data.quantity),
       };
-      await placeOrder(payload); // ✅ send object, not raw input
+      await placeOrder(payload);
       setOrderSuccess(true);
+      reset(); // ✅ Reset form fields
     } catch (error) {
       console.error('Failed to place order:', error);
+      setSubmitError(error?.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (!user) {
+    return (
+      <div className="order-form-container">
+        <p>You must be logged in to place an order.</p>
+        <Link to="/login">Go to Login</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="order-form-container">
       <h2>Place Your Order</h2>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
+
+      {submitError && <p className="error">{submitError}</p>}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="order-form">
+        <div className="form-group">
           <label htmlFor="menuItemId">Menu Item ID</label>
           <input
             type="text"
@@ -42,7 +60,7 @@ const OrderForm = () => {
           {errors.menuItemId && <p className="error">{errors.menuItemId.message}</p>}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="quantity">Quantity</label>
           <input
             type="number"
@@ -61,7 +79,7 @@ const OrderForm = () => {
         <OrderSuccessModal onClose={() => setOrderSuccess(false)} />
       )}
 
-      <Link to="/user/dashboard">Back to Dashboard</Link>
+      <Link to="/user/dashboard" className="back-link">Back to Dashboard</Link>
     </div>
   );
 };

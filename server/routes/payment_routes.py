@@ -1,96 +1,84 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import func
-from datetime import datetime, timedelta
-from server.models import Payment
 from server.extensions import db
-from server.services.daraja import lipa_na_mpesa, handle_mpesa_callback
+from server.models import Order, Payment
+from server.services.daraja import initiate_stk_push
+from flask import current_app as app
 
-payment_bp = Blueprint('payment_bp', __name__)
+payment_bp = Blueprint('payments', __name__)
 
-# Initiate STK push
-@payment_bp.route("/api/pay", methods=["POST"])
-def initiate_payment():
-    data = request.get_json()
-    phone = data.get("phone")
-    amount = data.get("amount")
-
-    if not phone or not amount:
-        return jsonify({"error": "Phone and amount are required."}), 400
-
+@payment_bp.route('/api/payment/stk-push', methods=['POST'])
+def stk_push():
     try:
-        result = lipa_na_mpesa(phone, amount)
-        return jsonify({"message": "STK push sent", "details": result}), 200
+        data = request.get_json()
+        amount = data.get('amount')
+        phone_number = data.get('phone_number')
+        order_id = data.get('order_id')
+
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
+
+        response = initiate_stk_push(amount, phone_number, order_id)
+        order.checkout_request_id = response.get('CheckoutRequestID')
+        db.session.commit()
+
+        return jsonify({
+            "message": "STK push initiated successfully",
+            "response": response
+        }), 200
     except Exception as e:
-        print("Error initiating payment:", str(e))
-        return jsonify({"error": "Failed to initiate payment"}), 500
+        print(f"Error initiating STK push: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-
-# M-PESA callback handler
-@payment_bp.route("/api/mpesa/callback", methods=["POST"])
+@payment_bp.route('/api/payment/callback', methods=['POST'])
 def mpesa_callback():
     try:
-        mpesa_data = request.get_json()
-        print("🔔 Received M-PESA Callback:", mpesa_data)
-        handle_mpesa_callback(mpesa_data)
-        return jsonify({"ResultCode": 0, "ResultDesc": "Callback received and processed"}), 200
+        data = request.get_json()
+        print(f"📩 Received M-PESA callback: {data}")
+
+        callback_data = data.get('Body', {}).get('stkCallback', {})
+        checkout_request_id = callback_data.get('CheckoutRequestID')
+        result_code = callback_data.get('ResultCode')
+        result_desc = callback_data.get('ResultDesc')
+
+        order = Order.query.filter_by(checkout_request_id=checkout_request_id).first()
+        if not order:
+            print(f"Order not found for CheckoutRequestID: {checkout_request_id}")
+            return jsonify({"error": "Order not found"}), 404
+
+        if result_code == 0:
+            callback_metadata = callback_data.get('CallbackMetadata', {}).get('Item', [])
+            metadata = {item['Name']: item['Value'] for item in callback_metadata}
+            amount = metadata.get('Amount')
+            transaction_id = metadata.get('MpesaReceiptNumber')
+            phone_number = metadata.get('PhoneNumber')
+
+            payment = Payment(
+                order_id=order.id,
+                amount=amount,
+                transaction_id=transaction_id,
+                phone_number=phone_number,
+                status='Completed',
+                created_at=app.extensions['db'].func.now()
+            )
+            order.paid = True
+            db.session.add(payment)
+            db.session.commit()
+            print(f"Payment saved: {payment.status}, Amount: {amount}, Transaction ID: {transaction_id}")
+        else:
+            print(f"M-PESA Callback failed: {result_desc}")
+            payment = Payment(
+                order_id=order.id,
+                amount=0,
+                transaction_id=None,
+                phone_number=None,
+                status=f'Failed: {result_desc}',
+                created_at=app.extensions['db'].func.now()
+            )
+            db.session.add(payment)
+            db.session.commit()
+
+        return jsonify({"message": "Callback processed"}), 200
     except Exception as e:
-        print("❌ Error processing callback:", str(e))
-        return jsonify({"ResultCode": 1, "ResultDesc": "Processing failed"}), 500
-
-
-# Revenue report endpoint
-@payment_bp.route("/api/admin/revenue", methods=["GET"])
-def get_revenue():
-    today = datetime.utcnow().date()
-    first_day_this_month = today.replace(day=1)
-    first_day_last_month = (first_day_this_month - timedelta(days=1)).replace(day=1)
-    last_day_last_month = first_day_this_month - timedelta(days=1)
-
-    # Filter completed payments
-    completed = Payment.query.filter_by(status="Completed")
-
-    # Daily revenue for this month
-    daily_revenue = (
-        completed
-        .filter(Payment.created_at >= first_day_this_month)
-        .with_entities(
-            func.date(Payment.created_at).label("date"),
-            func.sum(Payment.amount).label("amount")
-        )
-        .group_by(func.date(Payment.created_at))
-        .order_by(func.date(Payment.created_at))
-        .all()
-    )
-
-    daily_data = [{"date": d.date.strftime("%Y-%m-%d"), "amount": float(d.amount)} for d in daily_revenue]
-
-    # This month's total revenue
-    this_month_total = (
-        completed
-        .filter(Payment.created_at >= first_day_this_month)
-        .with_entities(func.sum(Payment.amount))
-        .scalar()
-    ) or 0
-
-    # Last month's total revenue
-    last_month_total = (
-        completed
-        .filter(Payment.created_at >= first_day_last_month, Payment.created_at <= last_day_last_month)
-        .with_entities(func.sum(Payment.amount))
-        .scalar()
-    ) or 0
-
-    # Today's revenue
-    today_total = (
-        completed
-        .filter(func.date(Payment.created_at) == today)
-        .with_entities(func.sum(Payment.amount))
-        .scalar()
-    ) or 0
-
-    return jsonify({
-        "daily": daily_data,
-        "this_month_total": float(this_month_total),
-        "last_month_total": float(last_month_total),
-        "today_total": float(today_total)
-    })
+        print(f"Error processing callback: {str(e)}")
+        return jsonify({"error": str(e)}), 500

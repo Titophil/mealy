@@ -1,65 +1,57 @@
-# services/daraja.py
-import base64, requests, os
-from dotenv import load_dotenv
+import requests
+import base64
 from datetime import datetime
-
-load_dotenv()
+from flask import current_app as app
 
 def get_access_token():
-    consumer_key = os.getenv("CONSUMER_KEY")
-    consumer_secret = os.getenv("CONSUMER_SECRET")
-    auth = (consumer_key, consumer_secret)
+    consumer_key = app.config['DARAJA_CONSUMER_KEY']
+    consumer_secret = app.config['DARAJA_CONSUMER_SECRET']
+    api_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+    
+    try:
+        auth = base64.b64encode(f"{consumer_key}:{consumer_secret}".encode()).decode()
+        headers = {'Authorization': f'Basic {auth}'}
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()
+        return response.json()['access_token']
+    except Exception as e:
+        print(f"Error getting access token: {str(e)}")
+        raise
 
-    response = requests.get(
-         "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
-         auth=auth
-    )
-
-    if response.status_code == 200:
-        return response.json().get("access_token")
-    else:
-        raise Exception("Failed to get access token: " + response.text)
-
-def lipa_na_mpesa(phone_number, amount):
+def initiate_stk_push(amount, phone_number, order_id):
     access_token = get_access_token()
-    shortcode = os.getenv("BUSINESS_SHORTCODE")
-    passKey = os.getenv("PASSKEY")
+    api_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+    
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-
-    data_to_encode = shortcode + passKey + timestamp
-    password = base64.b64encode(data_to_encode.encode()).decode()
-
+    shortcode = app.config['DARAJA_SHORTCODE']
+    passkey = app.config.get('DARAJA_PASSKEY', 'your_passkey')
+    password = base64.b64encode(f"{shortcode}{passkey}{timestamp}".encode()).decode()
+    
+    callback_url = 'https://14c747bcc0f9.ngrok-free.app/payments/api/payment/callback'
+    
     payload = {
-        "BusinessShortCode": shortcode,
-        "Password": password,
-        "Timestamp": timestamp,
-        "TransactionType": "CustomerPayBillOnline",
-        "Amount": amount,
-        "PartyA": phone_number,
-        "PartyB": shortcode,
-        "PhoneNumber": phone_number,
-        "CallBackURL": os.getenv("CALLBACK_URL"),
-        "AccountReference": "OrderPayment",
-        "TransactionDesc": "Payment for food order"
+        'BusinessShortCode': shortcode,
+        'Password': password,
+        'Timestamp': timestamp,
+        'TransactionType': 'CustomerPayBillOnline',
+        'Amount': amount,
+        'PartyA': phone_number,
+        'PartyB': shortcode,
+        'PhoneNumber': phone_number,
+        'CallBackURL': callback_url,
+        'AccountReference': f"Order_{order_id}",
+        'TransactionDesc': f"Payment for Order {order_id}"
     }
-
+    
     headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
     }
-
-    response = requests.post(
-        "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-        json=payload,
-        headers=headers
-    )
-
-    return response.json()
-
-def handle_mpesa_callback(mpesa_data):
-    """
-    Placeholder to process callback data.
-    You can log it, store it in a database, or verify transaction details.
-    """
-    print("M-PESA Callback received and handled:")
-    print(mpesa_data)
+    
+    try:
+        response = requests.post(api_url, json=payload, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error initiating STK push: {str(e)}")
+        raise

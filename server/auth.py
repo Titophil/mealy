@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from models.user import User  # Adjust if your user model is elsewhere
+from .models.user import User  # Adjust if your user model is elsewhere
 
 def login_required(f):
     @wraps(f)

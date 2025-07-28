@@ -2,6 +2,7 @@ import sys
 import os
 import random
 from flask import Flask
+from datetime import datetime
 
 # Ensure parent directory is in Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -9,9 +10,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from server.extensions import db
 from server.models.caterer import Caterer
 from server.models.Menu import Menu
-from server.models.Menu_item import MenuItem
+from server.models.Menu_item import Menu_item
 from server.models.Order import Order
 from server.models.MealOption import MealOption
+from server.models.User import User
 from server.config import Config
 
 # Flask app setup
@@ -61,21 +63,32 @@ def generate_meals():
         MenuItem.query.delete()
         Menu.query.delete()
         MealOption.query.delete()
+        User.query.delete()
+        Caterer.query.delete()
         db.session.commit()
 
         print("👨‍🍳 Ensuring default caterer exists...")
-        caterer = Caterer.query.first()
-        if not caterer:
-            caterer = Caterer(
-                name="Default Caterer",
-                email="caterer@example.com",
-                phone="1234567890"
-            )
-            caterer.password = "defaultpassword"  # Use the password setter
-            db.session.add(caterer)
-            db.session.commit()
+        caterer = Caterer(
+            name="Default Caterer",
+            email="caterer@example.com",
+            phone="1234567890"
+        )
+        caterer.password = "defaultpassword"
+        db.session.add(caterer)
+
+        print("👤 Ensuring default user exists...")
+        user = User(
+            id=17,  # Match JWT sub
+            username="testuser",
+            email="testuser@example.com",
+            phone="254712345678"
+        )
+        user.password = "testpassword"
+        db.session.add(user)
+        db.session.commit()
 
         print("🍽️ Seeding meal options...")
+        meal_options = []
         for i in range(len(image_files)):
             name = meal_names[i % len(meal_names)]
             category = categories[i % len(categories)]
@@ -91,9 +104,30 @@ def generate_meals():
                 caterer_id=caterer.id
             )
             db.session.add(meal)
+            meal_options.append(meal)
 
         db.session.commit()
-        print("✅ Meal seeding completed successfully!")
+
+        print("📅 Seeding menus and menu items...")
+        today = datetime.utcnow().date()
+        menu = Menu(
+            name=f"Menu for {today}",
+            menu_date=today,
+            caterer_id=caterer.id
+        )
+        db.session.add(menu)
+        db.session.commit()
+
+        for meal in meal_options[:5]:
+            menu_item = MenuItem(
+                name=meal.name,
+                menu_id=menu.id,
+                meal_option_id=meal.id
+            )
+            db.session.add(menu_item)
+
+        db.session.commit()
+        print("✅ Seeding completed successfully!")
 
 if __name__ == "__main__":
     generate_meals()

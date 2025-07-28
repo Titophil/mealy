@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./LoginPage.css"; // Optional: create for styling
 
-export default function Login() {
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,13 +29,13 @@ export default function Login() {
         if (role === "admin") {
           navigate("/admin");
         } else {
-          navigate("/customer");
+          navigate("/user/dashboard");
         }
       } else {
-        setError("Unexpected server response");
+        setError("Unexpected server response.");
       }
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.error) {
+      if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
         setError("Login failed. Please try again.");
@@ -44,8 +45,9 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} className="login-form">
         <h2>Login</h2>
+
         <input
           type="email"
           placeholder="Email"
@@ -53,6 +55,7 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -60,9 +63,13 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         <button type="submit">Login</button>
+
         {error && <p className="error">{error}</p>}
       </form>
     </div>
   );
-}
+};
+
+export default LoginPage;

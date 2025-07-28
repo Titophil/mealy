@@ -8,7 +8,26 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: false,
+      },
+      '/auth': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/admin': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/orders': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/user': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/payments': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
       },
     },
   },

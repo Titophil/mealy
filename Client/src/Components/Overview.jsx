@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from "react";
 import './admin.css';
 import { useNavigate } from "react-router-dom";
-import OrdersCard from './OrdersCard';
 import RevenueChart from './Revenue'; // You’ll create this next
+import OrdersCard from "./OrdersCard";
+
 
 
 export default function Overview() {
@@ -67,7 +68,7 @@ export default function Overview() {
          <RevenueChart />
        </div>
        <div className="orders-card-container">
-         <OrdersCard />
+         <OrdersCard/>
        </div>
      </div>
    </div>

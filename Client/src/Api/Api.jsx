@@ -1,4 +1,3 @@
-// src/api.js or Api.jsx
 import axios from 'axios';
 
 const api = axios.create({
@@ -10,8 +9,14 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    console.warn('No JWT token found in localStorage');
+  }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 // -------- AUTH --------
@@ -22,7 +27,8 @@ export const signupUser = (userData) => api.post('/auth/signup', userData);
 export const placeOrder = (menu_item_id) => api.post('/orders', { menu_item_id });
 export const updateOrder = (id, menu_item_id) => api.put(`/orders/${id}`, { menu_item_id });
 export const fetchTodaysOrder = () => api.get('/orders/current');
-export const fetchUserOrders = () => api.get('/users/orders');
+export const fetchUserOrders = () => api.get('/orders/user'); // Updated to match backend route
+export const fetchOrderDetails = () => api.get('/orders/user/details'); // Fixed URL
 
 // -------- MENU --------
 export const fetchTodayMenu = () => api.get('/menus/today');

@@ -23,9 +23,9 @@ const OrderForm = () => {
         menu_item_id: data.menuItemId,
         quantity: Number(data.quantity),
       };
-      await placeOrder(payload);
+      await placeOrder(payload, user.token); // ✅ pass the token here
       setOrderSuccess(true);
-      reset(); // ✅ Reset form fields
+      reset();
     } catch (error) {
       console.error('Failed to place order:', error);
       setSubmitError(error?.message || 'Something went wrong.');

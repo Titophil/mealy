@@ -16,10 +16,12 @@ function MenuViewer() {
   const fetchMenu = (date) => {
     getMenuByDate(date)
       .then((res) => {
+        console.log("Menu fetched:", res.data);
         setMenu(res.data);
         setError("");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Menu fetch error:", err);
         setMenu(null);
         setError("❌ No menu found for this date");
       });
@@ -59,11 +61,18 @@ function MenuViewer() {
 
       const amount = meal.price || 100;
       const foodName = meal.name;
-      const menuItemId = meal.id || null; // Assuming meal has an id field
+      const menuItemId = meal.id;
+
+      if (!menuItemId) {
+        console.error("Invalid menu item ID:", meal);
+        setPaymentStatus("❌ Invalid menu item selected.");
+        return;
+      }
 
       try {
         setLoadingPayment(true);
         setPaymentStatus("");
+        console.log("Initiating payment:", { phone: normalizedPhone, amount, foodName, customerName, menuItemId });
         const res = await axios.post(
           "http://localhost:5000/payments/api/payment/initiate",
           { phone: normalizedPhone, amount, food_name: foodName, customer_name: customerName, menu_item_id: menuItemId },
@@ -79,6 +88,18 @@ function MenuViewer() {
           res.data?.response?.ResponseCode === "0"
         ) {
           setPaymentStatus("✅ STK Push initiated. Check your phone to complete payment.");
+          try {
+            const orderRes = await axios.post(
+              "http://localhost:5000/orders",
+              { menu_item_id: menuItemId },
+              { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+            console.log("Order created:", orderRes.data);
+          } catch (orderErr) {
+            console.error("Order creation error:", orderErr.response?.data || orderErr.message);
+            setPaymentStatus(`❌ Payment initiated, but order creation failed: ${orderErr.response?.data?.error || orderErr.message}`);
+            return;
+          }
           setTimeout(() => {
             navigate("/user/orders", { replace: true });
           }, 8000);

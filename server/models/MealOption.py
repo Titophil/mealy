@@ -10,7 +10,7 @@ class MealOption(db.Model):
     name = Column(String, nullable=False, unique=True)
     description = Column(Text)
     price = Column(Float)
-    image = Column(String)
+    image = db.Column(db.String(255))
 
     caterer_id = Column(Integer, ForeignKey('caterers.id'), nullable=True)
     caterer = relationship('Caterer', back_populates='meal_options')

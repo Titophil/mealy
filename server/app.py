@@ -10,6 +10,7 @@ from server.routes.payment_routes import payment_bp
 from server.routes.auth_routes import auth_bp
 from server.routes.user_routes import user_bp
 from server.routes.Menu import menu_bp
+from server.routes.Order_routes import order_bp
 from server.routes.meal_routes import meal_bp
 from server.commands import seed
 
@@ -19,7 +20,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_jwt_secret')
-    print(f"Loaded SECRET_KEY: {app.config['SECRET_KEY']}")  # Debug SECRET_KEY
+    print(f"Loaded SECRET_KEY: {app.config['SECRET_KEY']}") 
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
     app.config['DARAJA_SHORTCODE'] = os.getenv('DARAJA_SHORTCODE')

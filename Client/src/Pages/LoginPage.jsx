@@ -1,68 +1,85 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useAuth } from '../auth/AuthContext';
+import { loginUser } from '../Api/Api';
+import './LoginPage.css';
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
+const LoginPage = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  const [loginError, setLoginError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    setLoginError(null);
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/auth/login", {
-        email,
-        password,
-      });
-
-      const { token, role, user_id, name } = response.data;
-
-      if (token) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify({ id: user_id, role, name }));
-
-        if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/user/dashboard");
-        }
+      const apiResponse = await loginUser(data.email, data.password);
+      
+      if (apiResponse.data && apiResponse.data.token && apiResponse.data.user) {
+        login(apiResponse.data.token, apiResponse.data.user);
+        navigate('/user/dashboard');
       } else {
-        setError("Unexpected server response");
+        setLoginError('Login response missing token or user data.');
       }
-    } catch (err) {
-      if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Login failed. Please try again.");
-      }
+    } catch (error) {
+      console.error("Login attempt failed:", error);
+      setLoginError(error.response?.data?.error || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleLogin}>
-        <h2>Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p className="error">{error}</p>}
-      </form>
+    <div className="login-page">
+      <div className="login-card">
+        <h2>Welcome Back to Mealy!</h2>
+        <p className="subtitle">Log in to manage your orders.</p>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Invalid email address'
+                }
+              })}
+            />
+            {errors.email && <p className="error-message">{errors.email.message}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              {...register('password', { required: 'Password is required' })}
+            />
+            {errors.password && <p className="error-message">{errors.password.message}</p>}
+          </div>
+
+          {loginError && <p className="error-message server-error">{loginError}</p>}
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Logging In...' : 'Log In'}
+          </button>
+        </form>
+
+        <p className="signup-link-text">
+          Don't have an account? <Link to="/signup">Sign Up</Link>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default LoginPage;

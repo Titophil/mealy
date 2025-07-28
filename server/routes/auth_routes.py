@@ -31,7 +31,7 @@ def signup():
 
     try:
         user = User(email=email, name=name, role=role)
-        user.password = password 
+        user.password = password
 
         db.session.add(user)
         db.session.commit()
@@ -61,6 +61,10 @@ def signup():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'Missing JSON data or invalid credentials format'}), 400
+
     email = data.get('email')
     password = data.get('password')
 
@@ -68,13 +72,22 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user or not user.authenticate(password):  
+    if not user or not user.authenticate(password):
         return jsonify({'error': 'Invalid email or password'}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity={
+        'id': user.id,
+        'email': user.email,
+        'name': user.name,
+        'role': user.role
+    })
+
     return jsonify({
         'token': access_token,
-        'role': user.role,
-        'user_id': user.id,
-        'name': user.name
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'name': user.name,
+            'role': user.role
+        }
     }), 200

@@ -1,16 +1,16 @@
-import React, { useContext, useState } from 'react';
-import { MealContext } from './MealContext';
+import React, { useState } from 'react';
+import { useMealContext } from './MealContext';
 import api from '../Api/Api';
 import "./admin.css";
 
 const Meals = () => {
-  const { meals, loading, error, setMeals } = useContext(MealContext);
+  const { meals, loading, error, addMeal, updateMeal, deleteMeal } = useMealContext();
   const [selectedItems, setSelectedItems] = useState([]);
   const [menuDate, setMenuDate] = useState('');
   const [message, setMessage] = useState('');
   const [showAddMealForm, setShowAddMealForm] = useState(false);
   const [newMeal, setNewMeal] = useState({ name: '', description: '', price: '', image: '' });
-  const [editingMeal, setEditingMeal] = useState(null); // State for editing a meal
+  const [editingMeal, setEditingMeal] = useState(null);
 
   const handleAddToMenu = (name) => {
     if (!selectedItems.includes(name)) {
@@ -22,10 +22,7 @@ const Meals = () => {
     if (!menuDate) return setMessage("Please provide a menu date (YYYY-MM-DD)");
 
     try {
-      await api.post('/menus', {
-        menu_date: menuDate,
-        items: selectedItems
-      });
+      await api.post('/menus', { menu_date: menuDate, items: selectedItems });
       setMessage("✅ Menu created successfully");
       setSelectedItems([]);
     } catch (err) {
@@ -36,31 +33,28 @@ const Meals = () => {
   const handleAddMeal = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/meals', newMeal);
-      const addedMeal = response.data;
-      setMeals([...meals, addedMeal]);
+      await addMeal(newMeal);
       setMessage("✅ Meal added successfully");
       setNewMeal({ name: '', description: '', price: '', image: '' });
       setShowAddMealForm(false);
     } catch (err) {
-      setMessage("❌ Failed to add meal: " + (err.response?.data?.error || err.message));
+      setMessage(error || "❌ Failed to add meal");
     }
   };
 
   const handleUpdate = (meal) => {
-    setEditingMeal(meal); // Set the meal to edit
+    setEditingMeal(meal);
     setNewMeal({ name: meal.name, description: meal.description, price: meal.price, image: meal.image });
-    setShowAddMealForm(true); // Show the form for editing
+    setShowAddMealForm(true);
   };
 
   const handleDelete = async (mealId) => {
     if (window.confirm(`Are you sure you want to delete ${meals.find(m => m.id === mealId)?.name}?`)) {
       try {
-        await api.delete(`/meals/${mealId}`);
-        setMeals(meals.filter(meal => meal.id !== mealId));
+        await deleteMeal(mealId);
         setMessage("✅ Meal deleted successfully");
       } catch (err) {
-        setMessage("❌ Failed to delete meal: " + (err.response?.data?.error || err.message));
+        setMessage(error || "❌ Failed to delete meal");
       }
     }
   };
@@ -69,15 +63,13 @@ const Meals = () => {
     e.preventDefault();
     if (editingMeal) {
       try {
-        const response = await api.put(`/meals/${editingMeal.id}`, newMeal);
-        const updatedMeal = response.data;
-        setMeals(meals.map(meal => meal.id === updatedMeal.id ? updatedMeal : meal));
+        await updateMeal(editingMeal.id, newMeal);
         setMessage("✅ Meal updated successfully");
         setNewMeal({ name: '', description: '', price: '', image: '' });
         setEditingMeal(null);
         setShowAddMealForm(false);
       } catch (err) {
-        setMessage("❌ Failed to update meal: " + (err.response?.data?.error || err.message));
+        setMessage(error || "❌ Failed to update meal");
       }
     }
   };

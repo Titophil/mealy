@@ -1,9 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext'; 
+import api from '../Api/Api';
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    const pollNotifications = async () => {
+      try {
+        const response = await api.get('/notifications');
+        setNotifications(response.data);
+        setNotificationCount(response.data.length);
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+      }
+    };
+
+    // Poll every 30 seconds
+    const interval = setInterval(pollNotifications, 30000);
+    pollNotifications(); // Initial fetch
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div>

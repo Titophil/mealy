@@ -31,7 +31,7 @@ def signup():
 
     try:
         user = User(email=email, name=name, role=role)
-        user.password = password  # ✅ Using the property setter
+        user.password = password 
 
         db.session.add(user)
         db.session.commit()
@@ -68,12 +68,13 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user or not user.authenticate(password):  # ✅ uses model's authenticate method
+    if not user or not user.authenticate(password):  
         return jsonify({'error': 'Invalid email or password'}), 401
 
     access_token = create_access_token(identity=user.id)
     return jsonify({
         'token': access_token,
         'role': user.role,
-        'user_id': user.id
+        'user_id': user.id,
+        'name': user.name
     }), 200

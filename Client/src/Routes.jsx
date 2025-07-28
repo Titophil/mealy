@@ -56,6 +56,10 @@ const AppRoutes = () => {
     
   </Route>
 
+  <Route element={<PrivateRoute />}>
+  <Route path="/user/dashboard" element={<UserDashboard />} />
+</Route>
+
   {/* 404 Fallback */}
   <Route path="*" element={<NotFound />} />
 </Routes>

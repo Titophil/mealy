@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { setToken, getToken, removeToken } from './authUtils';
-import { jwtDecode } from 'jwt-decode'; // ✅ FIXED HERE
+import { jwtDecode } from 'jwt-decode'; 
 
 const AuthContext = createContext(null);
 
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const decoded = jwtDecode(token);
         setIsAuthenticated(true);
-        setUser(decoded); // Assumes your JWT contains fields like { id, role }
+        setUser(decoded); 
       } catch (err) {
         console.error("Invalid token:", err);
         removeToken();
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   const login = (token, userData) => {
     setToken(token);
     setIsAuthenticated(true);
-    setUser(userData); // e.g., { id, role }
+    setUser(userData); 
   };
 
   const logout = () => {

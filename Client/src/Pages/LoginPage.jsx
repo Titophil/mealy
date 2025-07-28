@@ -19,16 +19,16 @@ export default function Login() {
         password,
       });
 
-      const { token, role, user_id } = response.data;
+      const { token, role, user_id, name } = response.data;
 
       if (token) {
         localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify({ id: user_id, role }));
+        localStorage.setItem("user", JSON.stringify({ id: user_id, role, name }));
 
         if (role === "admin") {
           navigate("/admin");
         } else {
-          navigate("/customer");
+          navigate("/user/dashboard");
         }
       } else {
         setError("Unexpected server response");

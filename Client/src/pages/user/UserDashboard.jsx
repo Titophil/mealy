@@ -9,13 +9,19 @@ const UserDashboard = () => {
   const handleLogout = () => {
     logout();      
     navigate('/'); 
+
+  useEffect(() => {
+    if (!user || !token) {
+      navigate('/login');
+    }
+  }, [user, token, navigate]);
   };
 
   return (
     <div className="user-dashboard-page">
       <div className="container">
         <div className="dashboard-header">
-          <h2>Hello, {user?.name || 'Mealy User'}!</h2>
+          <h2>Hello, {user && user.name ? user.name : ''}!</h2>
           <p className="subtitle">Welcome to your personalized Mealy dashboard. Here you can manage your meals and view your order history.</p>
         </div>
 

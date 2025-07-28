@@ -11,6 +11,7 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+
   } else {
     console.warn('No JWT token found in localStorage');
   }
@@ -32,7 +33,7 @@ export const fetchOrderDetails = () => api.get('/orders/user/details'); // Fixed
 
 // -------- MENU --------
 export const fetchTodayMenu = () => api.get('/menus/today');
-export const getMenuByDate = (date) => api.get(`/menus/${date}`);
+export const getMenuByDate = (date) => api.get(`/menu/${date}`);
 export const updateMenuItemStatus = (menuId, items) =>
   api.put(`/menus/${menuId}/update`, { items });
 
@@ -41,5 +42,8 @@ export const fetchMeals = () => api.get('/meals');
 export const createMeal = (mealData) => api.post('/meals', mealData);
 export const updateMeal = (id, mealData) => api.put(`/meals/${id}`, mealData);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`);
+export const createMenu = (menuData) => api.post('/menus', menuData);
+export const fetchNotifications = () => api.get('/notifications');
+
 
 export default api;

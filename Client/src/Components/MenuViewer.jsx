@@ -11,20 +11,26 @@ function MenuViewer() {
   );
   const [paymentStatus, setPaymentStatus] = useState("");
   const [loadingPayment, setLoadingPayment] = useState(false);
+
   const navigate = useNavigate();
 
-  const fetchMenu = (date) => {
-    getMenuByDate(date)
-      .then((res) => {
-        console.log("Menu fetched:", res.data);
-        setMenu(res.data);
+  const fetchMenu = async (date) => {
+    try {
+      const response = await getMenuByDate(date);
+      console.log("API Response:", response.data);
+
+      if (response.data && response.data.items && response.data.items.length > 0) {
+        setMenu(response.data);
         setError("");
-      })
-      .catch((err) => {
-        console.error("Menu fetch error:", err);
+      } else {
         setMenu(null);
-        setError("❌ No menu found for this date");
-      });
+        setError("❌ No menu items found for this date");
+      }
+    } catch (err) {
+      console.error("Fetch Error:", err.response?.data || err.message);
+      setMenu(null);
+      setError(`❌ Failed to load menu: ${err.response?.data?.message || err.message}`);
+    }
   };
 
   const debounce = (func, delay) => {
@@ -85,13 +91,6 @@ function MenuViewer() {
       try {
         setLoadingPayment(true);
         setPaymentStatus("");
-        console.log("Initiating payment:", {
-          phone: normalizedPhone,
-          amount,
-          foodName,
-          customerName,
-          menuItemId,
-        });
 
         const res = await axios.post(
           "http://localhost:5000/payments/api/payment/initiate",
@@ -115,6 +114,7 @@ function MenuViewer() {
           res.data?.response?.ResponseCode === "0"
         ) {
           setPaymentStatus("✅ STK Push initiated. Check your phone to complete payment.");
+
           try {
             const orderRes = await axios.post(
               "http://localhost:5000/orders",
@@ -183,32 +183,36 @@ function MenuViewer() {
       {menu && (
         <>
           <h3 className="text-xl font-semibold mb-4 text-center">
-            Menu for {menu.menu_date}
+            Menu for {new Date(menu.menu_date).toLocaleDateString()}
           </h3>
 
           <div className="meal-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menu.items.map((meal, index) => (
-              <div key={index} className="meal-card p-4 border rounded-lg shadow">
+              <div
+                key={index}
+                className="meal-card bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow"
+              >
                 {meal.image ? (
                   <img
                     src={meal.image}
                     alt={meal.name}
-                    className="meal-image w-full h-40 object-cover rounded"
+                    className="w-full h-48 object-cover rounded-t-lg"
                   />
                 ) : (
-                  <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-t-lg">
                     No Image
                   </div>
                 )}
-                <h3 className="meal-name text-lg font-bold mt-2">{meal.name}</h3>
-                <p className="meal-desc text-sm mt-1">
+
+                <h3 className="meal-name text-lg font-semibold mt-2">{meal.name}</h3>
+                <p className="meal-desc text-gray-700">
                   <strong>Description:</strong> {meal.description || "No description"}
                 </p>
-                <p className="meal-price mt-1">
+                <p className="meal-price text-gray-800">
                   <strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : "N/A"}
                 </p>
                 <button
-                  className="add-button mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                  className="mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
                   onClick={() => debouncedHandleOrder(meal)}
                   disabled={loadingPayment}
                 >

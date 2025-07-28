@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from server.models.user import User
+from server.models.caterer import Caterer
 from server.extensions import db, bcrypt
 from flask_jwt_extended import create_access_token
+from datetime import datetime
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
@@ -15,6 +17,7 @@ def signup():
     email = data.get('email', '').strip()
     password = data.get('password', '').strip()
     name = data.get('name', '').strip()
+    phone = data.get('phone', '').strip()  # Optional, for Caterer
 
     if not email or not password or not name:
         return jsonify({'error': 'Email, password, and name are required'}), 400
@@ -31,9 +34,15 @@ def signup():
 
     try:
         user = User(email=email, name=name, role=role)
-        user.password = password  # ✅ Using the property setter
+        user.password = password  # Using the property setter
 
         db.session.add(user)
+        db.session.flush()  # Get the user.id before commit
+
+        if role == 'admin':
+            caterer = Caterer(id=user.id, name=user.name, email=user.email, phone=phone or '', password=password)
+            db.session.add(caterer)
+
         db.session.commit()
 
         access_token = create_access_token(identity={
@@ -68,7 +77,7 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user or not user.authenticate(password):  # ✅ uses model's authenticate method
+    if not user or not user.authenticate(password):
         return jsonify({'error': 'Invalid email or password'}), 401
 
     access_token = create_access_token(identity=user.id)

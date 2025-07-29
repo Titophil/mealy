@@ -1,7 +1,6 @@
-// src/auth/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { setToken, getToken, removeToken } from './authUtils';
-import { jwtDecode } from 'jwt-decode'; // Ensure this import is correct
 
 const AuthContext = createContext(null);
 
@@ -11,51 +10,41 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = getToken();
-    if (token) {
+    if (token && typeof token === 'string') {
       try {
         const decoded = jwtDecode(token);
         if (decoded.exp * 1000 < Date.now()) {
-          console.warn("Token expired.");
-          removeToken();
-          setIsAuthenticated(false);
-          setUser(null);
+          logout(); // token expired
         } else {
           setIsAuthenticated(true);
-          // When component mounts, user data is decoded from the token
           setUser({
-            id: decoded.sub.id || decoded.id,
-            email: decoded.sub.email || decoded.email,
-            name: decoded.sub.name || decoded.name,
-            role: decoded.sub.role || decoded.role
+            id: decoded.id || decoded.sub?.id,
+            email: decoded.email || decoded.sub?.email,
+            name: decoded.name || decoded.sub?.name,
+            role: decoded.role || decoded.sub?.role,
           });
         }
       } catch (err) {
-        console.error("Invalid token on mount:", err); // Specific message for clarity
-        removeToken();
-        setIsAuthenticated(false);
-        setUser(null);
+        console.error("Invalid token:", err.message);
+        logout();
       }
     }
   }, []);
 
-  // Corrected: login function accepts both token and userData
-  const login = (token, userData) => {
-    setToken(token); // Store the raw token string
+  const login = (token) => {
     try {
-      const decoded = jwtDecode(token); // Attempt to decode the token string
+      const decoded = jwtDecode(token);
+      setToken(token);
       setIsAuthenticated(true);
-      // Use provided userData if available, otherwise decode from token's 'sub' claim
-      setUser(userData || {
-        id: decoded.sub.id || decoded.id, // Handle 'sub' structure from Flask-JWT-Extended
-        email: decoded.sub.email || decoded.email,
-        name: decoded.sub.name || decoded.name,
-        role: decoded.sub.role || decoded.role
+      setUser({
+        id: decoded.id || decoded.sub?.id,
+        email: decoded.email || decoded.sub?.email,
+        name: decoded.name || decoded.sub?.name,
+        role: decoded.role || decoded.sub?.role,
       });
     } catch (err) {
-      console.error("Failed to decode token after login:", err); // Original error point
-      removeToken(); // Clear token if invalid
-      setIsAuthenticated(false);
-      setUser(null);
+      console.error("Login failed:", err.message);
+      logout();
     }
   };
 
@@ -72,10 +61,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);

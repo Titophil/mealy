@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { getMenuByDate } from "../api/menuApi";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./admin.css";
+
 
 function MenuViewer() {
   const [menu, setMenu] = useState(null);
@@ -11,26 +13,18 @@ function MenuViewer() {
   );
   const [paymentStatus, setPaymentStatus] = useState("");
   const [loadingPayment, setLoadingPayment] = useState(false);
-
   const navigate = useNavigate();
 
-  const fetchMenu = async (date) => {
-    try {
-      const response = await getMenuByDate(date);
-      console.log("API Response:", response.data);
-
-      if (response.data && response.data.items && response.data.items.length > 0) {
-        setMenu(response.data);
+  const fetchMenu = (date) => {
+    getMenuByDate(date)
+      .then((res) => {
+        setMenu(res.data);
         setError("");
-      } else {
+      })
+      .catch(() => {
         setMenu(null);
-        setError("❌ No menu items found for this date");
-      }
-    } catch (err) {
-      console.error("Fetch Error:", err.response?.data || err.message);
-      setMenu(null);
-      setError(`❌ Failed to load menu: ${err.response?.data?.message || err.message}`);
-    }
+        setError("❌ No menu found for this date");
+      });
   };
 
   const debounce = (func, delay) => {
@@ -45,24 +39,10 @@ function MenuViewer() {
     async (meal) => {
       if (loadingPayment) return;
 
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
-      let userId = null;
-
-      try {
-        userId = user ? JSON.parse(user).id : null;
-      } catch (e) {
-        console.error("Failed to parse user from localStorage.");
-      }
-
+      const token = localStorage.getItem('token');
       if (!token) {
         setPaymentStatus("❌ Please log in to place an order.");
-        navigate("/login");
-        return;
-      }
-
-      if (!userId) {
-        setPaymentStatus("❌ User information missing.");
+        navigate('/login');
         return;
       }
 
@@ -73,65 +53,34 @@ function MenuViewer() {
         return;
       }
 
-      const normalizedPhone = phone.startsWith("0") ? `254${phone.slice(1)}` : phone;
-      if (!/^2547\d{8}$/.test(normalizedPhone)) {
+      const normalizedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone;
+      if (!normalizedPhone.match(/^2547\d{8}$/)) {
         setPaymentStatus("❌ Invalid phone number format.");
         return;
       }
 
       const amount = meal.price || 100;
       const foodName = meal.name;
-      const menuItemId = meal.menu_item_id || meal.id;
-
-      if (!menuItemId) {
-        setPaymentStatus("❌ Invalid menu item selected.");
-        return;
-      }
+      const menuItemId = meal.id || null; // Assuming meal has an id field
 
       try {
         setLoadingPayment(true);
         setPaymentStatus("");
-
         const res = await axios.post(
           "http://localhost:5000/payments/api/payment/initiate",
-          {
-            phone: normalizedPhone,
-            amount,
-            food_name: foodName,
-            customer_name: customerName,
-            menu_item_id: menuItemId,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            timeout: 15000,
+          { phone: normalizedPhone, amount, food_name: foodName, customer_name: customerName, menu_item_id: menuItemId },
+          { 
+            headers: { 'Authorization': `Bearer ${token}` },
+            timeout: 15000 
           }
         );
 
-        console.log("STK Push Response:", res.data);
-
+        console.log("STK Push Response:", JSON.stringify(res.data, null, 2));
         if (
           res.data?.message === "STK push initiated successfully" &&
           res.data?.response?.ResponseCode === "0"
         ) {
           setPaymentStatus("✅ STK Push initiated. Check your phone to complete payment.");
-
-          try {
-            const orderRes = await axios.post(
-              "http://localhost:5000/orders",
-              { menu_item_id: menuItemId, user_id: userId },
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            console.log("Order created:", orderRes.data);
-          } catch (orderErr) {
-            console.error("Order creation error:", orderErr.response?.data || orderErr.message);
-            setPaymentStatus(
-              `❌ Payment initiated, but order creation failed: ${
-                orderErr.response?.data?.error || orderErr.message
-              }`
-            );
-            return;
-          }
-
           setTimeout(() => {
             navigate("/user/orders", { replace: true });
           }, 8000);
@@ -141,6 +90,7 @@ function MenuViewer() {
             res.data?.response?.ResponseDescription ||
             "Failed to initiate STK Push";
           setPaymentStatus(`❌ Payment failed: ${errorMsg}`);
+          console.log("Error details:", { errorMsg, response: res.data });
         }
       } catch (err) {
         console.error("Payment error:", {
@@ -183,36 +133,29 @@ function MenuViewer() {
       {menu && (
         <>
           <h3 className="text-xl font-semibold mb-4 text-center">
-            Menu for {new Date(menu.menu_date).toLocaleDateString()}
+            Menu for {menu.menu_date}
           </h3>
 
-          <div className="meal-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="meal-list">
             {menu.items.map((meal, index) => (
-              <div
-                key={index}
-                className="meal-card bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow"
-              >
+              <div key={index} className="meal-card">
                 {meal.image ? (
-                  <img
-                    src={meal.image}
-                    alt={meal.name}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
+                  <img src={meal.image} alt={meal.name} className="meal-image" />
                 ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-t-lg">
+                  <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
                     No Image
                   </div>
                 )}
-
-                <h3 className="meal-name text-lg font-semibold mt-2">{meal.name}</h3>
-                <p className="meal-desc text-gray-700">
+                <h3 className="meal-name">{meal.name}</h3>
+                <p className="meal-desc">
                   <strong>Description:</strong> {meal.description || "No description"}
                 </p>
-                <p className="meal-price text-gray-800">
-                  <strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : "N/A"}
+                <p className="meal-price">
+                  <strong>Price:</strong>{" "}
+                  {meal.price ? `KSh ${meal.price}` : "N/A"}
                 </p>
                 <button
-                  className="mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                  className="add-button"
                   onClick={() => debouncedHandleOrder(meal)}
                   disabled={loadingPayment}
                 >
@@ -225,7 +168,9 @@ function MenuViewer() {
       )}
 
       {paymentStatus && (
-        <p className="text-center mt-6 font-medium text-blue-600">{paymentStatus}</p>
+        <p className="text-center mt-6 font-medium text-blue-600">
+          {paymentStatus}
+        </p>
       )}
     </div>
   );

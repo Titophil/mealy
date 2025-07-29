@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { fetchMeals, createMeal, updateMeal, deleteMeal } from '../Api/Api'; // Added updateMeal and deleteMeal
+import "./admin.css";
 
 export const MealContext = createContext();
 

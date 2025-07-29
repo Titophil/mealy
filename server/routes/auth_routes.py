@@ -30,15 +30,13 @@ def signup():
         else:
             return jsonify({'error': 'Email already exists'}), 400
 
-    role = 'admin' if email.endswith('@admin.gmail.com') else 'customer'
+    role = 'admin' if email.endswith('@admin.gmail.com') else 'user'
 
     try:
         user = User(email=email, name=name, role=role)
-<<<<<<< HEAD
-        user.password = password  # Using the property setter
-=======
+
         user.password = password
->>>>>>> origin/neema
+
 
         db.session.add(user)
         db.session.flush()  # Get the user.id before commit
@@ -97,15 +95,12 @@ def login():
 
     return jsonify({
         'token': access_token,
-<<<<<<< HEAD
-        'role': user.role,
-        'user_id': user.id
-=======
+
         'user': {
             'id': user.id,
             'email': user.email,
             'name': user.name,
             'role': user.role
         }
->>>>>>> origin/neema
+
     }), 200

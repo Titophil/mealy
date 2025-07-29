@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./MenuBuilder.css"; // Ensure you have this CSS file for styling
 
 function MenuBuilder() {
   const [meals, setMeals] = useState([]);

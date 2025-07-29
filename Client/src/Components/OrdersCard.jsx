@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchOrderDetails } from '../Api/Api'; // adjust the path if needed
+import { fetchOrderDetails } from '../Api/Api'; // Adjust the import path as needed
+ // Install via: npm i jwt-decode
 
 const OrdersCard = () => {
   const [orders, setOrders] = useState([]);
@@ -16,8 +18,16 @@ const OrdersCard = () => {
         return;
       }
 
-      const response = await fetchOrderDetails(); // Axios handles headers
-      setOrders(response.data.orders || []); // ✅ updated line
+      const decoded = jwtDecode(token);
+      const userId = decoded?.user_id;
+
+      if (!userId) {
+        setError('Invalid token or missing user ID.');
+        return;
+      }
+
+      const response = await fetchOrderDetails(userId); // ✅ Pass userId
+      setOrders(response.data || []); // Ensure fallback
       setError(null);
     } catch (err) {
       console.error('Error fetching order details:', err);
@@ -35,23 +45,7 @@ const OrdersCard = () => {
     loadOrders();
   }, []);
 
-  return (
-    <div className="orders-card">
-      <h3>Orders</h3>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {orders.length > 0 ? (
-        <ul>
-          {orders.map((order) => (
-            <li key={order.id}>
-              {order.food_name} - KSh {order.amount} ({order.status})
-            </li>
-          ))}
-        </ul>
-      ) : (
-        !error && <p>No orders found.</p>
-      )}
-    </div>
-  );
+  // UI remains unchanged
 };
 
 export default OrdersCard;

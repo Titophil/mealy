@@ -1,64 +1,57 @@
-
+// src/Pages/LoginPage.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
-import { loginUser } from '../Api/Api';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [loginError, setLoginError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setLoginError(null);
-
-
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
-      const apiResponse = await loginUser(data.email, data.password);
-      
-      if (apiResponse.data && apiResponse.data.token && apiResponse.data.user) {
-        login(apiResponse.data.token, apiResponse.data.user);
-        navigate('/user/dashboard');
+      const res = await axios.post('http://localhost:5000/auth/login', {
+        email,
+        password,
+      });
 
+      const token = res.data.token;
+      login(token);
+
+      // Redirect based on role
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      if (decoded.role === 'admin') {
+        navigate('/admin');
       } else {
-        setLoginError('Login response missing token or user data.');
+        navigate('/userDashboard');
       }
-    } catch (error) {
-      console.error("Login attempt failed:", error);
-      setLoginError(error.response?.data?.error || 'Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error('Login error:', err.message);
+      alert('Invalid credentials');
     }
   };
 
   return (
-
     <div className="login-page">
       <div className="login-card">
-        <h2>Welcome Back to Mealy!</h2>
-        <p className="subtitle">Log in to manage your orders.</p>
+        <h2>Login</h2>
+        <p className="subtitle">Welcome back! Please enter your credentials.</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+        <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email address</label>
             <input
               type="email"
               id="email"
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Invalid email address'
-                }
-              })}
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            {errors.email && <p className="error-message">{errors.email.message}</p>}
           </div>
 
           <div className="form-group">
@@ -66,27 +59,22 @@ const LoginPage = () => {
             <input
               type="password"
               id="password"
-              {...register('password', { required: 'Password is required' })}
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
-            {errors.password && <p className="error-message">{errors.password.message}</p>}
           </div>
 
-          {loginError && <p className="error-message server-error">{loginError}</p>}
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging In...' : 'Log In'}
-          </button>
+          <button type="submit">Login</button>
         </form>
 
-        <p className="signup-link-text">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </p>
+        <div className="signup-link-text">
+          Don’t have an account? <a href="/register">Sign up</a>
+        </div>
       </div>
-
     </div>
   );
 };
 
-
 export default LoginPage;
-

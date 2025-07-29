@@ -15,6 +15,7 @@ class Order(db.Model):
     order_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    meal_option_id = db.Column(db.Integer, db.ForeignKey('meal_options.id'))
 
     user = relationship('User', back_populates='orders')
     menu_item = relationship('MenuItem', back_populates='orders')

@@ -4,17 +4,8 @@ from dotenv import load_dotenv
 import os
 import logging
 
-<<<<<<< HEAD
-from .config import Config
-from .extensions import db, migrate, jwt
-from .routes.admin_routes import admin_bp
-from .routes.payment_routes import payment_bp
-from .routes.auth_routes import auth_bp
-from .routes.user_routes import user_bp
-from .routes.Menu import menu_bp
-from .routes.meal_routes import meal_bp
-from .routes.order_routes import order_bp  # Ensure this import is correct
-=======
+
+
 from server.config import Config
 from server.extensions import db, migrate, jwt
 from server.routes.admin_routes import admin_bp
@@ -22,22 +13,18 @@ from server.routes.payment_routes import payment_bp
 from server.routes.auth_routes import auth_bp
 from server.routes.user_routes import user_bp
 from server.routes.Menu import menu_bp
-from server.routes.Order_routes import order_bp
+from server.routes.order_routes import order_bp
 from server.routes.meal_routes import meal_bp
 from server.commands import seed
->>>>>>> origin/neema
 
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-<<<<<<< HEAD
-
-=======
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_jwt_secret')
     print(f"Loaded SECRET_KEY: {app.config['SECRET_KEY']}") 
->>>>>>> origin/neema
+
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
     app.config['DARAJA_SHORTCODE'] = os.getenv('DARAJA_SHORTCODE')

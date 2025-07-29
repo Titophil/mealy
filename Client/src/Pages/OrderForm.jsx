@@ -1,20 +1,31 @@
-import { useState } from 'react';
-import { placeOrder } from '../Api/Api.jsx'; // ✅ Ensure the correct file extension
-import OrderSuccessModal from '../Components/OrderSuccessModal'; // ✅ Capital 'C' in Components
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { placeOrder } from '../Api/Api';
+import OrderSuccessModal from '../Components/OrderSuccessModal';
 
 const OrderForm = () => {
   const [menuItemId, setMenuItemId] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please log in to place an order.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      await placeOrder(menuItemId);
+      await placeOrder({ menu_item_id: menuItemId });
       setSuccess(true);
+      setMenuItemId('');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Order failed');
+      console.error('Order error:', err.response?.data || err.message);
+      setError(err.response?.data?.error || 'Order failed');
     }
   };
 
@@ -32,6 +43,7 @@ const OrderForm = () => {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded"
+          disabled={!menuItemId}
         >
           Submit
         </button>

@@ -130,6 +130,7 @@ p {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  left: 0;
 
 }
 
@@ -201,6 +202,7 @@ p {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    left: 0;
 }
 
 .section-padding {

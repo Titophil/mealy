@@ -22,7 +22,6 @@ const AppNavbar = () => {
             {isAuthenticated ? (
               <>
                 <li><Link to="/userDashboard">Dashboard</Link></li>
-                <li><Link to="/user/orders">My Orders</Link></li>
                 {user?.role === 'admin' && (
                   <li><Link to="/admin">Admin Panel</Link></li>
                 )}

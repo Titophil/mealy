@@ -18,7 +18,7 @@ export default function Sidebar() {
           </li>
           <li>
             <NavLink
-              to="/admin/orders"
+              to="/admin/ordersCard"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Orders

@@ -4,7 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./admin.css";
 
-
 function MenuViewer() {
   const [menu, setMenu] = useState(null);
   const [error, setError] = useState("");
@@ -39,10 +38,10 @@ function MenuViewer() {
     async (meal) => {
       if (loadingPayment) return;
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
         setPaymentStatus("❌ Please log in to place an order.");
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
@@ -53,7 +52,7 @@ function MenuViewer() {
         return;
       }
 
-      const normalizedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone;
+      const normalizedPhone = phone.startsWith("0") ? `254${phone.slice(1)}` : phone;
       if (!normalizedPhone.match(/^2547\d{8}$/)) {
         setPaymentStatus("❌ Invalid phone number format.");
         return;
@@ -61,17 +60,23 @@ function MenuViewer() {
 
       const amount = meal.price || 100;
       const foodName = meal.name;
-      const menuItemId = meal.id || null; // Assuming meal has an id field
+      const menuItemId = meal.id || null;
 
       try {
         setLoadingPayment(true);
         setPaymentStatus("");
         const res = await axios.post(
           "http://localhost:5000/payments/api/payment/initiate",
-          { phone: normalizedPhone, amount, food_name: foodName, customer_name: customerName, menu_item_id: menuItemId },
-          { 
-            headers: { 'Authorization': `Bearer ${token}` },
-            timeout: 15000 
+          {
+            phone: normalizedPhone,
+            amount,
+            food_name: foodName,
+            customer_name: customerName,
+            menu_item_id: menuItemId,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: 15000,
           }
         );
 
@@ -81,9 +86,7 @@ function MenuViewer() {
           res.data?.response?.ResponseCode === "0"
         ) {
           setPaymentStatus("✅ STK Push initiated. Check your phone to complete payment.");
-          setTimeout(() => {
-            navigate("/user/orders", { replace: true });
-          }, 8000);
+          // Redirect removed
         } else {
           const errorMsg =
             res.data?.error ||
@@ -151,8 +154,7 @@ function MenuViewer() {
                   <strong>Description:</strong> {meal.description || "No description"}
                 </p>
                 <p className="meal-price">
-                  <strong>Price:</strong>{" "}
-                  {meal.price ? `KSh ${meal.price}` : "N/A"}
+                  <strong>Price:</strong> {meal.price ? `KSh ${meal.price}` : "N/A"}
                 </p>
                 <button
                   className="add-button"

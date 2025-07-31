@@ -1,35 +1,41 @@
+// src/Components/OrderCard.jsx
 import React from 'react';
+import './OrderCard.css';
 
 const OrderCard = ({ order }) => {
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return isNaN(date) ? 'Invalid Date' : date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return 'Invalid Date';
-    }
-  };
+  const formattedDate = new Date(order.created_at).toLocaleDateString('en-KE', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 
   return (
-    <div style={{ border: '1px solid #ddd', padding: '1rem', margin: '1rem 0', borderRadius: '8px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-        <span>{formatDate(order?.created_at)}</span>
-        <span style={{ fontWeight: 'bold' }}>{order?.status || 'Unknown Status'}</span>
+    <div className="order-card">
+      <div className="order-header">
+        <span className="order-date">{formattedDate}</span>
+        <span className={`order-status ${order.status.toLowerCase()}`}>
+          {order.status}
+        </span>
       </div>
-      <div>
-        <h4>Order ID: {order?.id || 'N/A'}</h4>
-        <ul style={{ paddingLeft: '1rem' }}>
-          <li>
-            1x {order?.menu_name || 'Unknown Item'} (KSh {parseFloat(order?.amount || 0).toFixed(2)})
-          </li>
-        </ul>
-        <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>
-          Total: KSh {parseFloat(order?.amount || 0).toFixed(2)}
-        </div>
+
+      <div className="order-details">
+        <p>
+          <strong>Order ID:</strong> {order.id}
+        </p>
+        <p>
+          <strong>Item:</strong> {order.menu_name} (KSh {order.amount.toFixed(2)})
+        </p>
+        <p>
+          <strong>Total:</strong> KSh {order.amount.toFixed(2)}
+        </p>
+        {order.image && (
+          <img
+            src={order.image}
+            alt={order.menu_name}
+            className="order-image"
+          />
+        )}
       </div>
     </div>
   );

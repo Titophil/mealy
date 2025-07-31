@@ -1,0 +1,146 @@
+/* OrderCard.css */
+.order-card {
+    background-color: #f8af73; 
+    border: 1px solid #e0e0e0; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(248, 133, 1, 0.651); 
+    padding: 16px; 
+    margin: 16px 0; 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    max-width: 400px; 
+    width: 100%; 
+  }
+  
+ 
+  .order-card:hover {
+    transform: translateY(-4px); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); 
+  }
+  
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 12px; 
+  }
+  
+  /* Date styling */
+  .order-date {
+    font-size: 0.9rem;
+    color: #000000;
+    font-weight: 500;
+  }
+  
+  /* Status styling with dynamic colors */
+  .order-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px; 
+    text-transform: capitalize;
+  }
+  
+  /* Status-specific colors */
+  .order-status.pending {
+    background-color: #ffeeba; 
+    color: #856404; 
+  }
+  
+  .order-status.confirmed {
+    background-color: #c3e6cb; 
+    color: #155724; 
+  }
+  
+  .order-status.cancelled {
+    background-color: #f5c6cb; 
+    color: #721c24; 
+  }
+  
+  /* Details section */
+  .order-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between detail items */
+  }
+  
+  /* Detail text */
+  .order-details p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #0f0f0f; /* Dark text for readability */
+  }
+  
+  .order-details p strong {
+    color: #000000; /* Black for emphasis */
+  }
+  
+  /* Image styling */
+  .order-image {
+    width: 100%;
+    max-height: 120px; /* Constrain image height */
+    object-fit: cover; /* Maintain aspect ratio */
+    border-radius: 4px; /* Slight rounding */
+    margin-top: 8px; /* Space above image */
+  }
+  
+  /* Responsive design */
+  @media (max-width: 600px) {
+    .order-card {
+      padding: 12px; /* Reduced padding on small screens */
+      margin: 8px 0; /* Reduced margin */
+    }
+  
+    .order-date,
+    .order-status {
+      font-size: 0.8rem; /* Smaller text */
+    }
+  
+    .order-details p {
+      font-size: 0.9rem; /* Smaller detail text */
+    }
+  
+    .order-image {
+      max-height: 100px; /* Smaller image on mobile */
+    }
+  }
+  
+  /* Dark theme support */
+  @media (prefers-color-scheme: dark) {
+    .order-card {
+      background-color: #ffbc90; /* Dark background */
+      border-color: #e79519; /* Darker border */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Darker shadow */
+    }
+  
+    .order-card:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+  
+    .order-date {
+      color: #bbbbbb; /* Light gray for date */
+    }
+  
+    .order-details p {
+      color: #dddddd; /* Light text for details */
+    }
+  
+    .order-details p strong {
+      color: #ffffff; /* White for emphasis */
+    }
+  
+    .order-status.pending {
+      background-color: #8a6d3b; /* Darker yellow */
+      color: #ffeeba;
+    }
+  
+    .order-status.confirmed {
+      background-color: #2f855a; /* Darker green */
+      color: #c3e6cb;
+    }
+  
+    .order-status.cancelled {
+      background-color: #a71d2a; /* Darker red */
+      color: #f5c6cb;
+    }
+  }

@@ -1,8 +1,11 @@
 [tool.poetry]
 name = "mealy"
 version = "0.1.0"
-description = "Your project description"
-authors = ["Titus Kiprono kipronotitus254@gmail.com"]
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+packages = [{ include = "mealy" }]
+
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"

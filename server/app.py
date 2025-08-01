@@ -3,9 +3,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import logging
-
-
-
+from logging.handlers import RotatingFileHandler
 from server.config import Config
 from server.extensions import db, migrate, jwt
 from server.routes.admin_routes import admin_bp
@@ -23,7 +21,15 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_jwt_secret')
-    print(f"Loaded SECRET_KEY: {app.config['SECRET_KEY']}") 
+
+    handler = RotatingFileHandler('mealy.log', maxBytes=1000000, backupCount=5)
+    handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    handler.setLevel(logging.DEBUG)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.DEBUG)
+    app.logger.info('Mealy application started')
 
     app.config['DARAJA_CONSUMER_KEY'] = os.getenv('DARAJA_CONSUMER_KEY')
     app.config['DARAJA_CONSUMER_SECRET'] = os.getenv('DARAJA_CONSUMER_SECRET')
@@ -34,29 +40,29 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    CORS(app, resources={r"/*": {"origins": ["https://sweet-tuzt.onrender.com", "http://localhost:5173"]}}, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": ["https://mealy-17.onrender.com", "http://localhost:5173"], "supports_credentials": True}})
 
-
-
-    logging.basicConfig(level=logging.DEBUG)
-    app.logger.setLevel(logging.DEBUG)
-
-    # Register blueprints
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(user_bp, url_prefix='/user')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(menu_bp, url_prefix='/menus')
-    app.register_blueprint(meal_bp, url_prefix='/meals')
-    app.register_blueprint(payment_bp, url_prefix='/payments')
-    app.register_blueprint(order_bp, url_prefix='/orders')  
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(user_bp, url_prefix='/api/users')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(menu_bp, url_prefix='/api/menu')
+    app.register_blueprint(meal_bp, url_prefix='/api/meals')
+    app.register_blueprint(payment_bp, url_prefix='/api/payments')
+    app.register_blueprint(order_bp, url_prefix='/api/orders')
 
     @app.route("/")
     def home():
+        app.logger.info("Accessed root endpoint")
         return jsonify(message="Welcome to the Mealy API 🚀"), 200
+
+    @app.errorhandler(Exception)
+    def handle_error(error):
+        app.logger.error(f"Unhandled error: {str(error)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
 
     return app
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True', port=int(os.getenv('PORT', 5000)))

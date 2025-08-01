@@ -1,91 +1,70 @@
-// src/Pages/SignupPage.jsx
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { signupUser } from '../Api/Api';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import './SignupPage.css';
+import { loginUser } from '../Api';
+import { useAuth } from '../AuthContext';
+import './LoginPage.css';
 
-const SignupPage = () => {
-  const { register, handleSubmit } = useForm();
-  const [loading, setLoading] = useState(false);
-  const [signupError, setSignupError] = useState('');
-  const { login } = useAuth();
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login, error: authError } = useAuth();
   const navigate = useNavigate();
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setSignupError('');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
     try {
-      const response = await signupUser(data);
-      login(response.token, response.user);
-
-      const isAdminEmail = data.email.endsWith('.admin@gmail.com');
-      if (isAdminEmail) {
-        navigate('/admin');
+      const res = await loginUser(email, password);
+      const success = await login(res.data.token);
+      if (success) {
+        const isAdmin = res.data.user.role === 'admin';
+        navigate(isAdmin ? '/admin' : '/userDashboard');
       } else {
-        navigate('/login');
+        setError('Failed to authenticate token');
       }
-    } catch (error) {
-      setSignupError(error?.message || 'Signup failed');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Invalid credentials');
     }
   };
 
   return (
-    <div className="signup-page">
-      <div className="signup-card">
-        <h2>Sign Up</h2>
-        <p className="subtitle">Create your account to get started</p>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
+    <div className="login-page">
+      <div className="login-card">
+        <h2>Login</h2>
+        <p className="subtitle">Welcome back! Please enter your credentials.</p>
+        {(error || authError) && <p className="error">{error || authError}</p>}
+        <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="email">Email address</label>
             <input
-              {...register('name')}
-              type="text"
-              id="name"
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              {...register('email')}
               type="email"
               id="email"
-              placeholder="Enter your email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
-              {...register('password')}
               type="password"
               id="password"
-              placeholder="Enter a password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Signing up...' : 'Sign Up'}
-          </button>
-
-          {signupError && <p style={{ color: 'red' }}>{signupError}</p>}
+          <button type="submit">Login</button>
         </form>
-
-        <div className="login-link-text">
-          Already have an account? <a href="/login">Login here</a>
+        <div className="signup-link-text">
+          Don’t have an account? <a href="/register">Sign up</a>
         </div>
       </div>
     </div>
   );
 };
 
-export default SignupPage;
+export default LoginPage;

@@ -1,38 +1,30 @@
-// src/Pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../auth/AuthContext';
+import { loginUser } from '../Api';
+import { useAuth } from '../AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
-        email,
-        password,
-      });
-      
-
-      const token = res.data.token;
-      login(token);
-
-      // Redirect based on role
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      if (decoded.role === 'admin') {
-        navigate('/admin');
+      const res = await loginUser(email, password);
+      const success = await login(res.data.token);
+      if (success) {
+        const isAdmin = res.data.user.role === 'admin';
+        navigate(isAdmin ? '/admin' : '/userDashboard');
       } else {
-        navigate('/userDashboard');
+        setError('Failed to authenticate token');
       }
     } catch (err) {
-      console.error('Login error:', err.message);
-      alert('Invalid credentials');
+      setError(err.response?.data?.error || 'Invalid credentials');
     }
   };
 
@@ -41,7 +33,7 @@ const LoginPage = () => {
       <div className="login-card">
         <h2>Login</h2>
         <p className="subtitle">Welcome back! Please enter your credentials.</p>
-
+        {error && <p className="error">{error}</p>}
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email address</label>
@@ -54,7 +46,6 @@ const LoginPage = () => {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -66,10 +57,8 @@ const LoginPage = () => {
               required
             />
           </div>
-
           <button type="submit">Login</button>
         </form>
-
         <div className="signup-link-text">
           Don’t have an account? <a href="/register">Sign up</a>
         </div>

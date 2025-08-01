@@ -34,7 +34,9 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    CORS(app, resources={r"/*": {"origins": "https://sweet-tuzt.onrender.com", "http://localhost:5173"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": ["https://sweet-tuzt.onrender.com", "http://localhost:5173"]}}, supports_credentials=True)
+
+
 
     logging.basicConfig(level=logging.DEBUG)
     app.logger.setLevel(logging.DEBUG)
@@ -46,7 +48,7 @@ def create_app():
     app.register_blueprint(menu_bp, url_prefix='/menus')
     app.register_blueprint(meal_bp, url_prefix='/meals')
     app.register_blueprint(payment_bp, url_prefix='/payments')
-    app.register_blueprint(order_bp, url_prefix='/orders')  # Critical line
+    app.register_blueprint(order_bp, url_prefix='/orders')  
 
     @app.route("/")
     def home():

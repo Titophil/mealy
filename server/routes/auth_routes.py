@@ -1,4 +1,4 @@
-]from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from server.models.user import User
 from server.models.caterer import Caterer
@@ -117,7 +117,6 @@ def login():
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500
 
-# Fallback route for incorrect /auth/signup calls
 @auth_bp.route('/../../auth/signup', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def signup_fallback():

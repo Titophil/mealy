@@ -8,3 +8,7 @@
 2025-08-01 08:58:46,587 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]
 2025-08-01 09:08:26,907 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]
 2025-08-01 09:08:33,159 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]
+2025-08-01 09:08:58,804 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]
+2025-08-01 09:16:57,550 INFO: Accessed root endpoint [in /home/user/Backend/server/app.py:66]
+2025-08-01 09:31:37,533 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]
+2025-08-01 09:31:44,423 INFO: Mealy application started [in /home/user/Backend/server/app.py:32]

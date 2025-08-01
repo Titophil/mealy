@@ -8,7 +8,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -33,7 +33,7 @@ const LoginPage = () => {
       <div className="login-card">
         <h2>Login</h2>
         <p className="subtitle">Welcome back! Please enter your credentials.</p>
-        {error && <p className="error">{error}</p>}
+        {(error || authError) && <p className="error">{error || authError}</p>}
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email address</label>

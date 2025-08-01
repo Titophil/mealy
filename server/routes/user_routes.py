@@ -1,11 +1,12 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
 from server.models.user import User
 from server.models.Order import Order
 from server.models.Menu_item import MenuItem
-from server.extensions import db
+from server.extensions import db, bcrypt
+from flask_jwt_extended import create_access_token
 import logging
 
 user_bp = Blueprint('user_bp', __name__)
@@ -13,13 +14,18 @@ user_bp = Blueprint('user_bp', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
 @user_bp.route('/orders', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def get_user_orders():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/users/orders")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     try:
         user_id = get_jwt_identity()['id']
         user = User.query.get_or_404(user_id)
@@ -40,13 +46,18 @@ def get_user_orders():
         logger.error(f"Error fetching user orders: {str(e)}", exc_info=True)
         return jsonify({'error': f'Failed to fetch orders: {str(e)}'}), 500
 
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
 @user_bp.route('/admin-dashboard', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def admin_dashboard():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/users/admin-dashboard")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     try:
         user_id = get_jwt_identity()['id']
         user = User.query.get_or_404(user_id)
@@ -59,12 +70,17 @@ def admin_dashboard():
         logger.error(f"Error accessing admin dashboard: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
 @user_bp.route('/register-and-order', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def register_and_order():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/users/register-and-order")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     try:
         data = request.get_json()
         name = data.get('name')

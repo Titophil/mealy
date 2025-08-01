@@ -41,7 +41,7 @@ def create_app():
     jwt.init_app(app)
 
     CORS(app, resources={
-        r"/*": {  # Apply CORS to all routes to catch /auth/signup
+        r"/*": {
             "origins": [
                 "https://mealy-17.onrender.com",
                 "https://sweet-tuzt.onrender.com",

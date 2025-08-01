@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from flask_cors import cross_origin
 from server.models.user import User
 from server.models.caterer import Caterer
@@ -16,7 +16,12 @@ logger = logging.getLogger(__name__)
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     try:
         data = request.get_json()
         if not data:
@@ -79,7 +84,12 @@ def signup():
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     try:
         data = request.get_json()
         if not data:
@@ -122,6 +132,11 @@ def login():
 def signup_fallback():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /auth/signup fallback")
-        return jsonify({}), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response, 200
     logger.warning("Incorrect endpoint /auth/signup called, redirecting to /api/auth/signup")
     return signup()

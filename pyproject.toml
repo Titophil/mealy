@@ -1,12 +1,9 @@
-package-mode = false
-
 [tool.poetry]
 name = "mealy"
 version = "0.1.0"
 description = ""
-authors = ["Titus Kiprono kipronotitus254@gmail.com"]
-
-
+authors = ["Titus Kiprono <kipronotitus254@gmail.com>"]
+package-mode = false  # ✅ Add this line
 
 
 [tool.poetry.dependencies]

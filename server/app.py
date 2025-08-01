@@ -34,7 +34,7 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "https://sweet-tuzt.onrender.com"}}, supports_credentials=True)
 
     logging.basicConfig(level=logging.DEBUG)
     app.logger.setLevel(logging.DEBUG)

@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-import axios from 'axios';
-
 const api = axios.create({
   baseURL: 'https://mealy-17.onrender.com',
   headers: {
@@ -9,7 +7,7 @@ const api = axios.create({
   },
 });
 
-// Attach token to each request if available
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -33,7 +31,7 @@ export const updateOrder = (id, menu_item_id) => api.put(`/orders/${id}`, { menu
 export const fetchTodaysOrder = () => api.get('/orders/current');
 export const fetchUserOrders = () => api.get('/orders/user');
 export const fetchOrderDetails = (user_id) =>
-  api.get('/orders/user/details', { params: { user_id } }); // 🔁 Accepts user_id as query param
+  api.get('/orders/user/details', { params: { user_id } }); 
 
 // ==================== MENUS ====================
 export const fetchTodayMenu = () => api.get('/menus/today');
@@ -58,6 +56,5 @@ export const updateUser = (id, userData) => api.put(`/users/${id}`, userData);
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 
 // If you want to fetch a specific user by ID
-export const fetchUserById = (user_id) => api.get(`/users/${user_id}`); // 👈 optional addition
-
+export const fetchUserById = (user_id) => api.get(`/users/${user_id}`); 
 export default api;

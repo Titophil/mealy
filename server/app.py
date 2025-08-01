@@ -1,11 +1,12 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 import logging
 from logging.handlers import RotatingFileHandler
 from server.config import Config
-from server.extensions import db, migrate, jwt
+from server.extensions import db, jwt
 from server.routes.admin_routes import admin_bp
 from server.routes.payment_routes import payment_bp
 from server.routes.auth_routes import auth_bp
@@ -37,7 +38,7 @@ def create_app():
     app.config['SPOONACULAR_API_KEY'] = os.getenv('SPOONACULAR_API_KEY')
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate = Migrate(app, db)
     jwt.init_app(app)
 
     CORS(app, resources={

@@ -21,11 +21,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ==================== AUTH ====================
+
 export const loginUser = (email, password) => api.post('/api/auth/login', { email, password });
 export const signupUser = (userData) => api.post('/api/auth/signup', userData);
 
-// ==================== ORDERS ====================
 export const placeOrder = (menu_item_id, user_id, quantity = 1) =>
   api.post('/api/orders/cart', { menu_item_id, user_id, quantity });
 export const updateOrder = (order_id, user_id) =>
@@ -36,23 +35,20 @@ export const fetchUserOrders = (user_id) =>
 export const fetchOrderDetails = (user_id) =>
   api.get('/api/orders/user/details', { params: { user_id } });
 
-// ==================== MENUS ====================
 export const fetchTodayMenu = () => api.get('/api/menu/today');
 export const getMenuByDate = (date) => api.get(`/api/menu/${date}`);
 export const createMenu = (menuData) => api.post('/api/menu', menuData);
 export const updateMenuItemStatus = (menuId, items) =>
   api.put(`/api/menu/${menuId}/update`, { items });
 
-// ==================== MEALS ====================
+
 export const fetchMeals = () => api.get('/api/meals');
 export const createMeal = (mealData) => api.post('/api/meals', mealData);
 export const updateMeal = (id, mealData) => api.put(`/api/meals/${id}`, mealData);
 export const deleteMeal = (id) => api.delete(`/api/meals/${id}`);
 
-// ==================== NOTIFICATIONS ====================
 export const fetchNotifications = () => api.get('/api/notifications');
 
-// ==================== USERS ====================
 export const fetchUsers = () => api.get('/api/users');
 export const createUser = (userData) => api.post('/api/users', userData);
 export const updateUser = (id, userData) => api.put(`/api/users/${id}`, userData);

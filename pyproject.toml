@@ -1,8 +1,10 @@
+package-mode = false
+
 [tool.poetry]
 name = "mealy"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Titus Kiprono kipronotitus254@gmail.com"]
 
 
 

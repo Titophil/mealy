@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
@@ -75,7 +75,7 @@ def signup():
         return jsonify({'error': f'Server error during signup: {str(e)}'}), 500
 
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")

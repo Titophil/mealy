@@ -40,7 +40,18 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    CORS(app, resources={r"/api/*": {"origins": ["https://mealy-17.onrender.com", "http://localhost:5173"], "supports_credentials": True}})
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": [
+                "https://mealy-17.onrender.com",
+                "https://sweet-tuzt.onrender.com",
+                "http://localhost:5173"
+            ],
+            "supports_credentials": True,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/users')

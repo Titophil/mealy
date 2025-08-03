@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { initiatePayment } from '../Api/Api';
 import { useNavigate } from 'react-router-dom';
 
 const PaymentForm = () => {
@@ -15,20 +15,24 @@ const PaymentForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/payment/initiate', {
+      const response = await initiatePayment({
         phone: phone.startsWith('0') ? `254${phone.slice(1)}` : phone,
         amount
       });
       console.log('STK Push Response:', response.data);
       if (response.data.response.ResponseCode === '0') {
         alert('STK Push initiated. Check your phone to complete payment.');
-        // Navigate to order confirmation or dashboard after a delay
         setTimeout(() => navigate('/user/orders'), 5000);
       } else {
         setError('Failed to initiate payment. Try again.');
       }
     } catch (err) {
-      console.error('Payment error:', err);
+      console.error('Payment error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        url: err.config?.url
+      });
       setError(err.response?.data?.error || 'Payment initiation failed.');
     } finally {
       setLoading(false);

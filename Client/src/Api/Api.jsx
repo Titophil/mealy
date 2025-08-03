@@ -21,9 +21,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
-export const loginUser = (email, password) => api.post('/api/auth/login', { email, password });
 export const signupUser = (userData) => api.post('/api/auth/signup', userData);
+export const loginUser = (email, password) => api.post('/api/auth/login', { email, password });
+
 
 export const placeOrder = (menu_item_id, user_id, quantity = 1) =>
   api.post('/api/orders/cart', { menu_item_id, user_id, quantity });

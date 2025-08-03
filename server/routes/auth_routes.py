@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, make_response
-from flask_cors import cross_origin
 from server.models.user import User
 from server.models.caterer import Caterer
 from server.extensions import db, bcrypt
@@ -12,16 +11,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
+        return make_response(), 200  # Rely on global CORS config
     try:
         data = request.get_json()
         if not data:
@@ -80,16 +73,10 @@ def signup():
         return jsonify({'error': f'Server error during signup: {str(e)}'}), 500
 
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
+        return make_response(), 200  # Rely on global CORS config
     try:
         data = request.get_json()
         if not data:
@@ -126,17 +113,3 @@ def login():
     except Exception as e:
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500
-
-@auth_bp.route('/../../auth/signup', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
-def signup_fallback():
-    if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /auth/signup fallback")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
-    logger.warning("Incorrect endpoint /auth/signup called, redirecting to /api/auth/signup")
-    return signup()

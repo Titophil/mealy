@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
-        return make_response(), 200  # Rely on global CORS config
+        return make_response(), 200
     try:
         data = request.get_json()
         if not data:
@@ -76,7 +76,7 @@ def signup():
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
-        return make_response(), 200  # Rely on global CORS config
+        return make_response(), 200
     try:
         data = request.get_json()
         if not data:
@@ -113,3 +113,11 @@ def login():
     except Exception as e:
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500
+
+@auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
+def signup_fallback():
+    if request.method == 'OPTIONS':
+        logger.debug("Handling OPTIONS request for /auth/signup")
+        return make_response(), 200
+    logger.warning("Incorrect endpoint /auth/signup called, use /api/auth/signup")
+    return jsonify({'error': 'Use /api/auth/signup instead'}), 400

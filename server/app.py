@@ -5,16 +5,16 @@ from dotenv import load_dotenv
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from server.config import Config
-from server.extensions import db, jwt
-from server.routes.admin_routes import admin_bp
-from server.routes.payment_routes import payment_bp
-from server.routes.auth_routes import auth_bp, auth_fallback_bp
-from server.routes.user_routes import user_bp
-from server.routes.Menu import menu_bp
-from server.routes.order_routes import order_bp
-from server.routes.meal_routes import meal_bp
-from server.commands import seed
+from .config import Config
+from .extensions import db, jwt
+from .routes.admin_routes import admin_bp
+from .routes.payment_routes import payment_bp
+from .routes.auth_routes import auth_bp, auth_fallback_bp
+from .routes.user_routes import user_bp
+from .routes.Menu import menu_bp
+from .routes.order_routes import order_bp
+from .routes.meal_routes import meal_bp
+from .commands import seed
 
 load_dotenv()
 

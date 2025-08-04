@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext'; // Correct path
+import { useAuth } from '../auth/AuthContext'; 
+import api from '../Api/Api'; 
 import './LoginPage.css';
 
 const LoginPage = () => {

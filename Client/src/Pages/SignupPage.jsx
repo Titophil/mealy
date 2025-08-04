@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { signupUser } from '../Api';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import './SignupPage.css';
 
 const SignupPage = () => {

@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
-        return make_response(), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = 'https://sweet-tuzt.onrender.com'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response, 200
 
     try:
         data = request.get_json()
@@ -79,7 +83,11 @@ def signup():
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
-        return make_response(), 200
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = 'https://sweet-tuzt.onrender.com'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response, 200
 
     try:
         data = request.get_json()
@@ -94,7 +102,7 @@ def login():
             return jsonify({'error': 'Email and password are required'}), 400
 
         user = User.query.filter_by(email=email).first()
-        if not user or not bcrypt.check_password_hash(user.password_hash, password):
+        if not user or not bcrypt.check_password_hash(user.password, password):
             logger.warning(f"Invalid login attempt for email: {email}")
             return jsonify({'error': 'Invalid email or password'}), 401
 

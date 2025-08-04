@@ -65,10 +65,8 @@ export const loginUser = async (email, password) => {
 
 export const placeOrder = (menu_item_id, user_id, quantity = 1) =>
   api.post('/api/orders/cart', { menu_item_id, user_id, quantity });
-
 export const updateOrder = (order_id, user_id) =>
   api.delete(`/api/orders/cart/${order_id}`, { params: { user_id } });
-
 export const fetchTodaysOrder = () => api.get('/api/orders/current');
 export const fetchUserOrders = (user_id) =>
   api.get('/api/users/orders', { params: { user_id } });

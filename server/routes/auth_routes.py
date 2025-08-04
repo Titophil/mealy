@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token
 import logging
 
 auth_bp = Blueprint('auth_bp', __name__)
+auth_fallback_bp = Blueprint('auth_fallback_bp', __name__)  # Separate blueprint for fallback
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -114,7 +115,7 @@ def login():
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500
 
-@auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
+@auth_fallback_bp.route('/signup', methods=['POST', 'OPTIONS'])
 def signup_fallback():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /auth/signup")

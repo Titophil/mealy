@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 from flask_cors import CORS
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -54,14 +54,20 @@ def create_app():
         }
     })
 
+    # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(auth_bp, url_prefix='/auth')  # Added for fallback
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(menu_bp, url_prefix='/api/menu')
     app.register_blueprint(meal_bp, url_prefix='/api/meals')
     app.register_blueprint(payment_bp, url_prefix='/api/payments')
     app.register_blueprint(order_bp, url_prefix='/api/orders')
+
+    # Catch-all OPTIONS handler for any invalid route
+    @app.route('/<path:path>', methods=['OPTIONS'])
+    def handle_options(path):
+        app.logger.debug(f"Handling OPTIONS request for /{path}")
+        return make_response(), 200
 
     @app.route("/")
     def home():

@@ -1,44 +1,70 @@
+
 from flask import Blueprint, request, jsonify
-from flask_cors import cross_origin
+from server.models.user import User
 from server.models.MealOption import MealOption
-from .extensions import db
+from server.extensions import db
+from flask_jwt_extended import jwt_required, get_jwt_identity
+import functools
 
-meal_routes = Blueprint("meal_bp", __name__)
+meal_bp = Blueprint('meals', __name__)
 
-# CORS whitelist
-allowed_origins = [
-    "http://localhost:5173",
-    "https://mealy-8-1cv8.onrender.com",
-    "https://mealy-12-fnkh.onrender.com"
-]
+def caterer_required(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role != 'caterer':
+            return jsonify({"error": "Caterer access required"}), 403
+        return fn(*args, **kwargs)
+    return wrapper
 
-@meal_routes.route("/api/meals", methods=["POST"])
-@cross_origin(origins=allowed_origins, supports_credentials=True)
-def create_meal():
-    try:
-        data = request.get_json()
-        name = data.get("name")
-        description = data.get("description")
-        price = data.get("price")
-
-        if not all([name, description, price]):
-            return jsonify({"error": "Missing meal fields"}), 400
-
-        new_meal = Meal(name=name, description=description, price=price)
-        db.session.add(new_meal)
-        db.session.commit()
-
-        return jsonify({"message": "Meal created successfully", "meal": new_meal.to_dict()}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@meal_routes.route("/api/meals", methods=["GET"])
-@cross_origin(origins=allowed_origins, supports_credentials=True)
+@meal_bp.route('/', methods=['GET'])
 def get_meals():
-    try:
-        meals = Meal.query.all()
-        meal_list = [meal.to_dict() for meal in meals]
-        return jsonify(meal_list), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    meals = MealOption.query.all()
+    return jsonify([{
+        "id": m.id,
+        "name": m.name,
+        "description": m.description,
+        "price": m.price,
+        "image": m.image,
+        "caterer_id": m.caterer_id
+    } for m in meals]), 200
+
+@meal_bp.route('', methods=['POST'])
+@jwt_required()
+@caterer_required
+def create_meal():
+    data = request.get_json()
+    meal = MealOption(
+        name=data['name'],
+        description=data.get('description', ''),
+        price=data['price'],
+        image=data.get('image', ''),
+        caterer_id=get_jwt_identity()
+    )
+    db.session.add(meal)
+    db.session.commit()
+    return jsonify(message="Meal created", id=meal.id), 201
+
+@meal_bp.route('/<int:id>', methods=['PUT', 'DELETE'])
+@jwt_required()
+@caterer_required
+def update_or_delete_meal(id):
+    meal = MealOption.query.get_or_404(id)
+
+    if meal.caterer_id != get_jwt_identity():
+        return jsonify(error="Not allowed"), 403
+
+    if request.method == 'PUT':
+        data = request.get_json()
+        meal.name = data.get('name', meal.name)
+        meal.description = data.get('description', meal.description)
+        meal.price = data.get('price', meal.price)
+        meal.image = data.get('image', meal.image)
+        db.session.commit()
+        return jsonify(message="Meal updated"), 200
+
+    elif request.method == 'DELETE':
+        db.session.delete(meal)
+        db.session.commit()
+        return jsonify(message="Meal deleted"), 200

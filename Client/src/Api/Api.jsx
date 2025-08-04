@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { getToken } from '../auth/authUtils'; // Correct path
+import { getToken } from '../auth/authUtils'; 
 
 const api = axios.create({
-  baseURL: 'https://mealy-17.onrender.com',
+  baseURL: 'https://mealy-8-1cv8.onrender.com/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,7 +23,7 @@ api.interceptors.request.use(
 
 export const signupUser = async (userData) => {
   try {
-    console.log('Making signup request to:', 'https://mealy-17.onrender.com/api/auth/signup');
+    console.log('Making signup request to:', 'https://mealy-8-1cv8.onrender.com/api/auth/signup');
     const response = await api.post('/api/auth/signup', userData);
     console.log('Signup response:', {
       status: response.status,

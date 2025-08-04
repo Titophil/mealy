@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def login_required(f):
     @wraps(f)
-    @cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
+    @cross_origin(origins=["http://localhost:5173", "https://mealy-8-1cv8.onrender.com/"], supports_credentials=True)
     def decorated_function(*args, **kwargs):
         try:
             verify_jwt_in_request()
@@ -28,7 +28,7 @@ def login_required(f):
 def admin_required():
     def decorator(f):
         @wraps(f)
-        @cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com"], supports_credentials=True)
+        @cross_origin(origins=["http://localhost:5173", "https://mealy-8-1cv8.onrender.com/"], supports_credentials=True)
         def decorated_function(*args, **kwargs):
             try:
                 verify_jwt_in_request()

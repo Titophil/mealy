@@ -44,7 +44,7 @@ def create_app():
     CORS(app, resources={
         r"/*": {
             "origins": [
-                "https://mealy-8-1cv8.onrender.com/",
+                "https://mealy-8-1cv8.onrender.com",
                 "https://sweet-tuzt.onrender.com",
                 "http://localhost:5173"
             ],

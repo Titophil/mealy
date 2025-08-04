@@ -3,7 +3,7 @@ from flask_cors import cross_origin
 from .models import  Meal
 from .extensions import db
 
-meal_routes = Blueprint("meal_routes", __name__)
+meal_routes = Blueprint("meal_bp", __name__)
 
 # CORS whitelist
 allowed_origins = [

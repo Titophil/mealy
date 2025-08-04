@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken } from './authUtils';
+import { getToken } from '../auth/authUtils'; // Correct path
 
 const api = axios.create({
   baseURL: 'https://mealy-17.onrender.com',

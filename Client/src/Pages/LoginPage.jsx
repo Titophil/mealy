@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../Api';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../auth/AuthContext'; // Correct path
 import './LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, error: authError } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      const res = await loginUser(email, password);
-      const success = await login(res.data.token);
-      if (success) {
-        const isAdmin = res.data.user.role === 'admin';
-        navigate(isAdmin ? '/admin' : '/userDashboard');
-      } else {
-        setError('Failed to authenticate token');
-      }
+      const res = await login(email, password); // Use login from AuthContext
+      const isAdmin = res.data.user.role === 'admin';
+      navigate(isAdmin ? '/admin' : '/user/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Invalid credentials');
+      console.error('Login error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        url: err.config?.url,
+      });
     }
   };
 
@@ -33,7 +33,7 @@ const LoginPage = () => {
       <div className="login-card">
         <h2>Login</h2>
         <p className="subtitle">Welcome back! Please enter your credentials.</p>
-        {(error || authError) && <p className="error">{error || authError}</p>}
+        {error && <p className="error">{error}</p>}
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email address</label>
@@ -60,7 +60,7 @@ const LoginPage = () => {
           <button type="submit">Login</button>
         </form>
         <div className="signup-link-text">
-          Don’t have an account? <a href="/register">Sign up</a>
+          Don’t have an account? <a href="/signup">Sign up</a>
         </div>
       </div>
     </div>

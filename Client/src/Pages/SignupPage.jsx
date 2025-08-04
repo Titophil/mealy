@@ -1,51 +1,102 @@
-// src/Pages/SignupPage.jsx
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { signupUser } from '../Api/Api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import './SignupPage.css';
 
 const SignupPage = () => {
-  const { signup } = useAuth();
+  const { register, handleSubmit } = useForm();
+  const [loading, setLoading] = useState(false);
+  const [signupError, setSignupError] = useState('');
+  const { login, error: authError } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user',
-  });
-
-  const [error, setError] = useState('');
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  const onSubmit = async (data) => {
+    setLoading(true);
+    setSignupError('');
 
     try {
-      await signup(formData.name, formData.email, formData.password, formData.role);
-      navigate('/meals');
-    } catch (err) {
-      setError('Signup failed. Please try again.');
+      const response = await signupUser(data);
+
+      // Ensure token and user data exist
+      const token = response?.data?.access_token;
+      const user = response?.data?.user;
+
+      if (!token || !user) {
+        setSignupError('Invalid signup response. Please try again.');
+        return;
+      }
+
+      // Save token and redirect
+      const success = await login(token);
+      if (success) {
+        const isAdmin = user.role === 'admin';
+        navigate(isAdmin ? '/admin' : '/userDashboard');
+      } else {
+        setSignupError('Authentication failed. Invalid token.');
+      }
+    } catch (error) {
+      const errMsg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Signup failed. Please try again.';
+      setSignupError(errMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-        <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-        <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-        <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button type="submit">Signup</button>
-      </form>
+    <div className="signup-page">
+      <div className="signup-card">
+        <h2>Sign Up</h2>
+        <p className="subtitle">Create your account to get started</p>
+        {(signupError || authError) && <p className="error">{signupError || authError}</p>}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
+          <div className="form-group">
+            <label htmlFor="name">Name</label>
+            <input
+              {...register('name')}
+              type="text"
+              id="name"
+              placeholder="Enter your name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              {...register('email')}
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              {...register('password')}
+              type="password"
+              id="password"
+              placeholder="Enter a password"
+              required
+            />
+          </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <div className="login-link-text">
+          Already have an account? <a href="/login">Login here</a>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ from server.config import Config
 from server.extensions import db, jwt
 from server.routes.admin_routes import admin_bp
 from server.routes.payment_routes import payment_bp
-from server.routes.auth_routes import auth_bp
+from server.routes.auth_routes import auth_bp, auth_fallback_bp
 from server.routes.user_routes import user_bp
 from server.routes.Menu import menu_bp
 from server.routes.order_routes import order_bp
@@ -56,6 +56,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(auth_fallback_bp, url_prefix='/auth')  # Fallback for /auth/signup
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(menu_bp, url_prefix='/api/menu')
@@ -63,7 +64,7 @@ def create_app():
     app.register_blueprint(payment_bp, url_prefix='/api/payments')
     app.register_blueprint(order_bp, url_prefix='/api/orders')
 
-    # Catch-all OPTIONS handler for any invalid route
+    # Catch-all OPTIONS handler
     @app.route('/<path:path>', methods=['OPTIONS'])
     def handle_options(path):
         app.logger.debug(f"Handling OPTIONS request for /{path}")
@@ -73,6 +74,16 @@ def create_app():
     def home():
         app.logger.info("Accessed root endpoint")
         return jsonify(message="Welcome to the Mealy API 🚀"), 200
+
+    @app.route("/favicon.ico")
+    def favicon():
+        app.logger.info("Serving favicon.ico")
+        return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/x-icon')
+
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        app.logger.error(f"Method not allowed: {str(error)}")
+        return jsonify({"error": "Method not allowed for this endpoint"}), 405
 
     @app.errorhandler(Exception)
     def handle_error(error):

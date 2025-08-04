@@ -6,7 +6,7 @@ from flask_jwt_extended import create_access_token
 import logging
 
 auth_bp = Blueprint('auth_bp', __name__)
-auth_fallback_bp = Blueprint('auth_fallback_bp', __name__)  # Separate blueprint for fallback
+auth_fallback_bp = Blueprint('auth_fallback_bp', __name__)
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { getToken, setToken, removeToken } from '../auth/authUtils';
-import { signupUser, loginUser } from '../Api/api';
+import { signupUser, loginUser } from '../Api/Api';
 
 const AuthContext = createContext();
 

@@ -1,7 +1,7 @@
 // src/Pages/SignupPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../auth/AuthContext';
 
 const SignupPage = () => {
   const { signup } = useAuth();

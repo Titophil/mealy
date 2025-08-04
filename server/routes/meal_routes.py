@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-from models import db, Meal
+from .models import  Meal
+from .extensions import db
 
 meal_routes = Blueprint("meal_routes", __name__)
 

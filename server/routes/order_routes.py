@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-from server.models import db, Order, MealOption
+from server.models import  Order, MealOption
+from server.extensions import db
 import logging
 
 order_bp = Blueprint('orders', __name__)

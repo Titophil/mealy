@@ -24,7 +24,7 @@ api.interceptors.request.use(
 // Auth
 export const signupUser = async (userData) => {
   try {
-    const response = await api.post('/auth/signup', userData);
+    const response = await api.post('api/auth/signup', userData);
     return response;
   } catch (error) {
     console.error('Signup error:', error);

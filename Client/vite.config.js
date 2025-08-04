@@ -6,28 +6,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://mealy-8-1cv8.onrender.com',
         changeOrigin: true,
-      },
-      '/auth': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/admin': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/orders': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/user': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-      '/payments': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
       },
     },
   },

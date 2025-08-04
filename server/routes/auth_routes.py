@@ -5,8 +5,7 @@ from server.extensions import db, bcrypt
 from flask_jwt_extended import create_access_token
 import logging
 
-auth_bp = Blueprint('auth_bp', __name__)
-auth_fallback_bp = Blueprint('auth_fallback_bp', __name__)
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -16,6 +15,7 @@ def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
         return make_response(), 200
+
     try:
         data = request.get_json()
         if not data:
@@ -51,15 +51,16 @@ def signup():
             db.session.add(caterer)
 
         db.session.commit()
+
         access_token = create_access_token(identity={
             'id': user.id,
             'email': user.email,
             'name': user.name,
             'role': user.role
         })
+
         logger.info(f"User signed up: {email}")
         return jsonify({
-            'message': 'User created successfully',
             'access_token': access_token,
             'user': {
                 'id': user.id,
@@ -68,16 +69,18 @@ def signup():
                 'role': user.role
             }
         }), 201
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error during signup: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during signup: {str(e)}'}), 500
 
-@auth_bp.route('/api/auth/login', methods=['POST', 'OPTIONS'])
+@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
         return make_response(), 200
+
     try:
         data = request.get_json()
         if not data:
@@ -101,9 +104,10 @@ def login():
             'name': user.name,
             'role': user.role
         })
+
         logger.info(f"User logged in: {email}")
         return jsonify({
-            'token': access_token,
+            'access_token': access_token,
             'user': {
                 'id': user.id,
                 'email': user.email,
@@ -111,6 +115,7 @@ def login():
                 'role': user.role
             }
         }), 200
+
     except Exception as e:
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500

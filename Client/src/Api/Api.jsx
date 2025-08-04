@@ -3,13 +3,13 @@ import axios from 'axios';
 import { getToken } from '../auth/authUtils';
 
 const api = axios.create({
-  baseURL: '/api', 
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Automatically add token to every request if available
+
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -23,13 +23,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ------------------- AUTH -------------------
-export const signupUser = async (userData) => {
+
+export const signupUser = async ({ name, email, password, phone }) => {
   try {
-    const response = await api.post('/auth/signup', userData);
-    return response;
+    const response = await api.post('/auth/signup', {
+      name,
+      email,
+      password,
+      phone,
+    });
+    return response.data;
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Signup error:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -37,14 +42,14 @@ export const signupUser = async (userData) => {
 export const loginUser = async (email, password) => {
   try {
     const response = await api.post('/auth/login', { email, password });
-    return response;
+    return response.data;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.response?.data || error.message);
     throw error;
   }
 };
 
-// ------------------- ORDERS -------------------
+
 export const placeOrder = (menu_item_id, user_id, quantity = 1) =>
   api.post('/orders/cart', { menu_item_id, user_id, quantity });
 
@@ -57,20 +62,19 @@ export const fetchUserOrders = (user_id) =>
 export const fetchOrderDetails = (user_id) =>
   api.get('/orders/user/details', { params: { user_id } });
 
-// ------------------- MENU -------------------
+
 export const fetchTodayMenu = () => api.get('/menu/today');
 export const getMenuByDate = (date) => api.get(`/menu/${date}`);
 export const createMenu = (menuData) => api.post('/menu', menuData);
 export const updateMenuItemStatus = (menuId, items) =>
   api.put(`/menu/${menuId}/update`, { items });
 
-// ------------------- MEALS -------------------
+
 export const fetchMeals = () => api.get('/meals');
 export const createMeal = (mealData) => api.post('/meals', mealData);
 export const updateMeal = (id, mealData) => api.put(`/meals/${id}`, mealData);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`);
 
-// ------------------- NOTIFICATIONS -------------------
 export const fetchNotifications = () => api.get('/notifications');
 
 // ------------------- USERS -------------------

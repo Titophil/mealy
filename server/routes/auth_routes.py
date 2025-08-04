@@ -73,7 +73,7 @@ def signup():
         logger.error(f"Error during signup: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during signup: {str(e)}'}), 500
 
-@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
+@auth_bp.route('/api/auth/login', methods=['POST', 'OPTIONS'])
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
@@ -91,7 +91,7 @@ def login():
             return jsonify({'error': 'Email and password are required'}), 400
 
         user = User.query.filter_by(email=email).first()
-        if not user or not bcrypt.check_password_hash(user.password, password):
+        if not user or not bcrypt.check_password_hash(user.password_hash, password):
             logger.warning(f"Invalid login attempt for email: {email}")
             return jsonify({'error': 'Invalid email or password'}), 401
 
@@ -114,11 +114,3 @@ def login():
     except Exception as e:
         logger.error(f"Error during login: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during login: {str(e)}'}), 500
-
-@auth_fallback_bp.route('/signup', methods=['POST', 'OPTIONS'])
-def signup_fallback():
-    if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /auth/signup")
-        return make_response(), 200
-    logger.warning("Incorrect endpoint /auth/signup called, use /api/auth/signup")
-    return jsonify({'error': 'Use /api/auth/signup instead'}), 400

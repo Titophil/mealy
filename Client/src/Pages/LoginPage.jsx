@@ -1,12 +1,11 @@
-// src/Pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
+import './LoginPage.css';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
@@ -17,24 +16,57 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     try {
-      await login(formData.email, formData.password);
-      navigate('/meals');
+      const response = await login(formData.email, formData.password);
+      const isAdmin = response.data.user.role === 'admin';
+      navigate(isAdmin ? '/admin' : '/meals');
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
+      console.error('Login error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+      });
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-        <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-        <button type="submit">Login</button>
-      </form>
+    <div className="login-page">
+      <div className="login-card">
+        <h2>Login</h2>
+        <p className="subtitle">Welcome back! Please enter your credentials.</p>
+        {error && <p className="error">{error}</p>}
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              name="email"
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              name="password"
+              type="password"
+              id="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit">Login</button>
+        </form>
+        <div className="signup-link-text">
+          Don’t have an account? <a href="/signup">Sign up</a>
+        </div>
+      </div>
     </div>
   );
 };

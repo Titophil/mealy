@@ -1,41 +1,23 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { signupUser } from '../Api/Api';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import './SignupPage.css';
 
 const SignupPage = () => {
   const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
   const [signupError, setSignupError] = useState('');
-  const { login, error: authError } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     setLoading(true);
     setSignupError('');
-
     try {
-      const response = await signupUser(data);
-
-      // Ensure token and user data exist
-      const token = response?.data?.access_token;
-      const user = response?.data?.user;
-
-      if (!token || !user) {
-        setSignupError('Invalid signup response. Please try again.');
-        return;
-      }
-
-      // Save token and redirect
-      const success = await login(token);
-      if (success) {
-        const isAdmin = user.role === 'admin';
-        navigate(isAdmin ? '/admin' : '/userDashboard');
-      } else {
-        setSignupError('Authentication failed. Invalid token.');
-      }
+      await signup(data);
+      const isAdmin = data.email.endsWith('@admin.gmail.com');
+      navigate(isAdmin ? '/admin' : '/meals');
     } catch (error) {
       const errMsg =
         error.response?.data?.error ||
@@ -52,7 +34,7 @@ const SignupPage = () => {
       <div className="signup-card">
         <h2>Sign Up</h2>
         <p className="subtitle">Create your account to get started</p>
-        {(signupError || authError) && <p className="error">{signupError || authError}</p>}
+        {signupError && <p className="error">{signupError}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
           <div className="form-group">
@@ -85,6 +67,16 @@ const SignupPage = () => {
               id="password"
               placeholder="Enter a password"
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="phone">Phone (optional)</label>
+            <input
+              {...register('phone')}
+              type="text"
+              id="phone"
+              placeholder="Enter your phone"
             />
           </div>
 

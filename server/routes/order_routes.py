@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://sweet-tuzt.onrender.com"
+    "https://mealy-8-1cv8.onrender.com",
+    "https://mealy-12-fnkh.onrender.com",
 ]
 
 @order_bp.route('/', methods=['POST', 'OPTIONS'])

@@ -1,12 +1,11 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from sqlalchemy.exc import IntegrityError
 from server.models.user import User
 from server.models.Order import Order
 from server.models.Menu_item import MenuItem
 from server.extensions import db, bcrypt
-from flask_jwt_extended import create_access_token
 import logging
 
 user_bp = Blueprint('user_bp', __name__)
@@ -14,18 +13,19 @@ user_bp = Blueprint('user_bp', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-@user_bp.route('/orders', methods=['GET', 'OPTIONS'])
+# Define allowed CORS origins once
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://mealy-8-1cv8.onrender.com",
+    "https://mealy-12-fnkh.onrender.com",
+
+]
+
+
+@user_bp.route('/orders', methods=['GET'])
 @jwt_required()
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def get_user_orders():
-    if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /api/users/orders")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
     try:
         user_id = get_jwt_identity()['id']
         user = User.query.get_or_404(user_id)
@@ -46,18 +46,11 @@ def get_user_orders():
         logger.error(f"Error fetching user orders: {str(e)}", exc_info=True)
         return jsonify({'error': f'Failed to fetch orders: {str(e)}'}), 500
 
-@user_bp.route('/admin-dashboard', methods=['GET', 'OPTIONS'])
+
+@user_bp.route('/admin-dashboard', methods=['GET'])
 @jwt_required()
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def admin_dashboard():
-    if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /api/users/admin-dashboard")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
     try:
         user_id = get_jwt_identity()['id']
         user = User.query.get_or_404(user_id)
@@ -70,17 +63,10 @@ def admin_dashboard():
         logger.error(f"Error accessing admin dashboard: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
-@user_bp.route('/register-and-order', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "https://mealy-17.onrender.com", "https://sweet-tuzt.onrender.com"], supports_credentials=True)
+
+@user_bp.route('/register-and-order', methods=['POST'])
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def register_and_order():
-    if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /api/users/register-and-order")
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response, 200
     try:
         data = request.get_json()
         name = data.get('name')
@@ -93,8 +79,7 @@ def register_and_order():
             return jsonify({"error": "Missing required fields"}), 400
 
         with db.session.begin():
-            existing_user = User.query.filter_by(email=email).first()
-            if existing_user:
+            if User.query.filter_by(email=email).first():
                 logger.warning(f"Email already registered: {email}")
                 return jsonify({"error": "Email already registered"}), 400
 
@@ -123,11 +108,17 @@ def register_and_order():
             'name': new_user.name,
             'role': new_user.role
         })
+
         logger.info(f"User registered and order placed: {email}")
         return jsonify({
             "message": "User registered and order placed successfully",
             "access_token": access_token,
-            "user": {"id": new_user.id, "name": new_user.name, "email": new_user.email, "role": new_user.role},
+            "user": {
+                "id": new_user.id,
+                "name": new_user.name,
+                "email": new_user.email,
+                "role": new_user.role
+            },
             "order": {
                 "id": new_order.id,
                 "menu_item_id": new_order.menu_item_id,
@@ -135,6 +126,7 @@ def register_and_order():
                 "quantity": new_order.quantity
             }
         }), 201
+
     except IntegrityError as e:
         db.session.rollback()
         logger.error(f"Integrity error in register-and-order: {str(e)}")

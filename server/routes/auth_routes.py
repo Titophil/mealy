@@ -10,7 +10,7 @@ auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-@auth_bp.route('api/auth/signup', methods=['POST', 'OPTIONS'])
+@auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
 def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
@@ -79,7 +79,7 @@ def signup():
         logger.error(f"Error during signup: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error during signup: {str(e)}'}), 500
 
-@auth_bp.route('api/auth/login', methods=['POST', 'OPTIONS'])
+@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")

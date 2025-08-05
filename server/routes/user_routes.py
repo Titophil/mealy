@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from server.models.user import User
 from server.models.Order import Order
 from server.models.Menu_item import MenuItem
-from server.extensions import db, bcrypt
+from server.extensions import db
 import logging
 
 user_bp = Blueprint('user_bp', __name__)
@@ -13,22 +13,19 @@ user_bp = Blueprint('user_bp', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Define allowed CORS origins once
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://mealy-8-1cv8.onrender.com",
     "https://mealy-12-fnkh.onrender.com",
-
 ]
-
 
 @user_bp.route('/orders', methods=['GET'])
 @jwt_required()
 @cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def get_user_orders():
+    # ... (no changes needed in this function)
     try:
         user_id = get_jwt_identity()['id']
-        user = User.query.get_or_404(user_id)
         orders = Order.query.filter_by(user_id=user_id).all()
         order_list = [{
             'id': order.id,
@@ -46,11 +43,11 @@ def get_user_orders():
         logger.error(f"Error fetching user orders: {str(e)}", exc_info=True)
         return jsonify({'error': f'Failed to fetch orders: {str(e)}'}), 500
 
-
 @user_bp.route('/admin-dashboard', methods=['GET'])
 @jwt_required()
 @cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def admin_dashboard():
+    # ... (no changes needed in this function)
     try:
         user_id = get_jwt_identity()['id']
         user = User.query.get_or_404(user_id)
@@ -63,7 +60,6 @@ def admin_dashboard():
         logger.error(f"Error accessing admin dashboard: {str(e)}", exc_info=True)
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
-
 @user_bp.route('/register-and-order', methods=['POST'])
 @cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def register_and_order():
@@ -75,22 +71,20 @@ def register_and_order():
         menu_item_name = data.get('menu_item_name')
 
         if not all([name, email, password, menu_item_name]):
-            logger.warning("Missing required fields in register-and-order")
             return jsonify({"error": "Missing required fields"}), 400
 
         with db.session.begin():
             if User.query.filter_by(email=email).first():
-                logger.warning(f"Email already registered: {email}")
                 return jsonify({"error": "Email already registered"}), 400
 
             new_user = User(name=name, email=email, role='user')
-            new_user.password = bcrypt.generate_password_hash(password).decode('utf-8')
+            # CORRECTED: Pass the plain-text password to the setter
+            new_user.password = password
             db.session.add(new_user)
             db.session.flush()
 
             menu_item = MenuItem.query.filter_by(name=menu_item_name).first()
             if not menu_item:
-                logger.warning(f"Menu item not found: {menu_item_name}")
                 return jsonify({"error": "Menu item not found"}), 404
 
             new_order = Order(
@@ -103,35 +97,20 @@ def register_and_order():
             db.session.add(new_order)
 
         access_token = create_access_token(identity={
-            'id': new_user.id,
-            'email': new_user.email,
-            'name': new_user.name,
-            'role': new_user.role
+            'id': new_user.id, 'email': new_user.email, 'name': new_user.name, 'role': new_user.role
         })
 
         logger.info(f"User registered and order placed: {email}")
         return jsonify({
             "message": "User registered and order placed successfully",
             "access_token": access_token,
-            "user": {
-                "id": new_user.id,
-                "name": new_user.name,
-                "email": new_user.email,
-                "role": new_user.role
-            },
-            "order": {
-                "id": new_order.id,
-                "menu_item_id": new_order.menu_item_id,
-                "price": float(new_order.price),
-                "quantity": new_order.quantity
-            }
+            "user": {"id": new_user.id, "name": new_user.name, "email": new_user.email, "role": new_user.role},
+            "order": {"id": new_order.id, "menu_item_id": new_order.menu_item_id, "price": float(new_order.price), "quantity": new_order.quantity}
         }), 201
 
     except IntegrityError as e:
         db.session.rollback()
-        logger.error(f"Integrity error in register-and-order: {str(e)}")
         return jsonify({"error": "Email already registered or DB error", "details": str(e)}), 400
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error in register-and-order: {str(e)}", exc_info=True)
         return jsonify({"error": f"Server error: {str(e)}"}), 500

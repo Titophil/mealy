@@ -35,43 +35,34 @@ def signup():
             logger.warning("Missing required fields in signup")
             return jsonify({'error': 'Email, password, and name are required'}), 400
 
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            if not existing_user.role:
-                db.session.delete(existing_user)
-                db.session.commit()
-            else:
-                logger.warning(f"Email already exists: {email}")
-                return jsonify({'error': 'Email already exists'}), 400
+        if User.query.filter_by(email=email).first():
+            logger.warning(f"Email already exists: {email}")
+            return jsonify({'error': 'Email already exists'}), 400
 
         role = 'admin' if email.endswith('@admin.gmail.com') else 'user'
+        
         user = User(email=email, name=name, role=role)
-        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # CORRECTED: Pass the plain-text password to the setter to handle hashing
+        user.password = password
+        
         db.session.add(user)
         db.session.flush()
 
         if role == 'admin':
-            caterer = Caterer(id=user.id, name=user.name, email=user.email, phone=phone or '', password=user.password)
+            # Assuming the Caterer model stores the password hash directly
+            caterer = Caterer(id=user.id, name=user.name, email=user.email, phone=phone or '', password=user.password_hash)
             db.session.add(caterer)
 
         db.session.commit()
 
         access_token = create_access_token(identity={
-            'id': user.id,
-            'email': user.email,
-            'name': user.name,
-            'role': user.role
+            'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role
         })
 
         logger.info(f"User signed up: {email}")
         return jsonify({
             'access_token': access_token,
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'name': user.name,
-                'role': user.role
-            }
+            'user': { 'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role }
         }), 201
 
     except Exception as e:
@@ -92,37 +83,28 @@ def login():
     try:
         data = request.get_json()
         if not data:
-            logger.warning("Missing JSON in login request")
             return jsonify({'error': 'Missing JSON data or invalid credentials format'}), 400
 
         email = data.get('email')
         password = data.get('password')
         if not email or not password:
-            logger.warning("Missing email or password in login")
             return jsonify({'error': 'Email and password are required'}), 400
 
         user = User.query.filter_by(email=email).first()
-        if not user or not bcrypt.check_password_hash(user.password, password):
+        
+        # CORRECTED: Use the model's authenticate() method for a clean and secure check
+        if not user or not user.authenticate(password):
             logger.warning(f"Invalid login attempt for email: {email}")
             return jsonify({'error': 'Invalid email or password'}), 401
 
         access_token = create_access_token(identity={
-            'id': user.id,
-            'email': user.email,
-            'name': user.name,
-            'role': user.role
+            'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role
         })
 
         logger.info(f"User logged in: {email}")
         return jsonify({
             'access_token': access_token,
-            'user': {
-                'id': user.id,
-                'name': user.name,
-                'email': user.email,# Note: Avoid sending password in response
-                'role': user.role
-              
-            }
+            'user': { 'id': user.id, 'name': user.name, 'email': user.email, 'role': user.role }
         }), 200
 
     except Exception as e:

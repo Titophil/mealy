@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { getToken } from '../auth/authUtils';
 
+// Use environment variable for production, fallback for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mealy-12-fnkh.onrender.com/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,9 +17,8 @@ api.interceptors.request.use(
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn('No JWT token found in localStorage');
     }
+    // No warning needed if token is not present for public routes like login/signup
     return config;
   },
   (error) => Promise.reject(error)
@@ -25,42 +27,20 @@ api.interceptors.request.use(
 // ------------------- AUTH -------------------
 export const signupUser = async (userData) => {
   try {
-    console.log('Making signup request to:', '/auth/signup');
     const response = await api.post('/auth/signup', userData);
-    console.log('Signup response:', {
-      status: response.status,
-      data: response.data,
-      url: response.config.url,
-    });
     return response;
   } catch (error) {
-    console.error('Signup error:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-    });
+    console.error('Signup error:', error.response || error);
     throw error;
   }
 };
 
 export const loginUser = async (email, password) => {
   try {
-    console.log('Making login request to:', '/auth/login');
     const response = await api.post('/auth/login', { email, password });
-    console.log('Login response:', {
-      status: response.status,
-      data: response.data,
-      url: response.config.url,
-    });
     return response;
   } catch (error) {
-    console.error('Login error:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-    });
+    console.error('Login error:', error.response || error);
     throw error;
   }
 };
@@ -73,8 +53,10 @@ export const updateOrder = (order_id, user_id) =>
   api.delete(`/orders/cart/${order_id}`, { params: { user_id } });
 
 export const fetchTodaysOrder = () => api.get('/orders/current');
-export const fetchUserOrders = (user_id) =>
-  api.get('/users/orders', { params: { user_id } });
+
+// CORRECTED: The endpoint is /orders, not /users/orders.
+// The user_id is derived from the JWT on the backend, so no need to pass it.
+export const fetchUserOrders = () => api.get('/orders');
 
 export const fetchOrderDetails = (user_id) =>
   api.get('/orders/user/details', { params: { user_id } });

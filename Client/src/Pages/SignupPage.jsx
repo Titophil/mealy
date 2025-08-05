@@ -15,8 +15,13 @@ const SignupPage = () => {
     setLoading(true);
     setSignupError('');
     try {
-      await signup(data);
-      const isAdmin = data.email.endsWith('@admin.gmail.com');
+      // The signup function returns the full response from the server
+      const response = await signup(data);
+      
+      // CORRECTED: Use the user role from the API response for navigation
+      const userRole = response.data.user.role;
+      const isAdmin = userRole === 'admin';
+      
       navigate(isAdmin ? '/admin' : '/dashboard', {
         state: { message: 'Signup successful! Welcome!' },
       });
@@ -73,7 +78,7 @@ const SignupPage = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phone">Phone (optional)</label>
+            <label htmlFor="phone">Phone (optional for admins)</label>
             <input
               {...register('phone')}
               type="text"

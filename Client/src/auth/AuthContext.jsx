@@ -16,10 +16,12 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        // Check if token is expired
         if (decoded.exp * 1000 < Date.now()) {
           logout();
         } else {
           setIsAuthenticated(true);
+          // The backend identity is the main payload, not nested in 'sub'
           setUser({
             id: decoded.id,
             email: decoded.email,
@@ -41,19 +43,10 @@ export const AuthProvider = ({ children }) => {
       if (!access_token || !user) throw new Error('Invalid signup response');
       setToken(access_token);
       setIsAuthenticated(true);
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      });
-      return response;
+      setUser(user); // The user object from the response is complete
+      return response; // Return the full response for navigation
     } catch (err) {
-      console.error('Signup failed:', {
-        message: err.message,
-        status: err.response?.status,
-        data: err.response?.data,
-      });
+      console.error('Signup failed:', err.response?.data || err.message);
       throw err;
     }
   };
@@ -65,19 +58,10 @@ export const AuthProvider = ({ children }) => {
       if (!access_token || !user) throw new Error('Invalid login response');
       setToken(access_token);
       setIsAuthenticated(true);
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      });
-      return response;
+      setUser(user);
+      return response; // Return the full response for navigation
     } catch (err) {
-      console.error('Login failed:', {
-        message: err.message,
-        status: err.response?.status,
-        data: err.response?.data,
-      });
+      console.error('Login failed:', err.response?.data || err.message);
       throw err;
     }
   };

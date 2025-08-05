@@ -1,4 +1,3 @@
-
 from server.extensions import db, bcrypt
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
@@ -19,14 +18,17 @@ class User(db.Model, SerializerMixin):
 
     @property
     def password(self):
-        raise AttributeError("Password is write-only.")
+        raise AttributeError("Password is a write-only attribute.")
 
     @password.setter
     def password(self, value):
+        # This setter now correctly handles hashing a plain-text password
         self.password_hash = bcrypt.generate_password_hash(value).decode('utf-8')
 
     def authenticate(self, password):
+        # This method correctly checks the provided password against the stored hash
         return bcrypt.check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        # CORRECTED: Changed self.username to self.name
+        return f'<User {self.name}>'

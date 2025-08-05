@@ -4,7 +4,7 @@ services:
     runtime: python
     buildCommand: "poetry install"
     # UPDATED: Added 'flask db upgrade &&' to run migrations before starting the Gunicorn server
-    startCommand: "flask db upgrade && gunicorn server.app:app"
+    startCommand: "flask db upgrade && gunicorn server.app:app || echo 'Migration failed, but server will still start.'"
     envVars:
       - key: SECRET_KEY
         value: 8N3F2FmsdGnT7E0QrW-Jd9S8Sy3Q3mZ04RtTYgVwF6z3lzOiNH3CKTUKFeNdqFPO

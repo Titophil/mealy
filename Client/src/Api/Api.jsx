@@ -2,8 +2,9 @@ import axios from 'axios';
 import { getToken } from '../auth/authUtils';
 
 // Use environment variable for production, fallback for development
-const API_BASE_URL =  'https://mealy-8-1cv8.onrender.com/api/v1';
-// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api/v1';
+// CORRECTED: Removed '/v1' from the base URL to match backend routes
+const API_BASE_URL = 'https://mealy-8-1cv8.onrender.com/api';
+// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { getToken } from '../auth/authUtils';
 
 // Use environment variable for production, fallback for development
-// CORRECTED: Removed '/v1' from the base URL to match backend routes
 const API_BASE_URL = 'https://mealy-8-1cv8.onrender.com/api';
 // const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -56,8 +55,6 @@ export const updateOrder = (order_id, user_id) =>
 
 export const fetchTodaysOrder = () => api.get('/orders/current');
 
-// CORRECTED: The endpoint is /orders, not /users/orders.
-// The user_id is derived from the JWT on the backend, so no need to pass it.
 export const fetchUserOrders = () => api.get('/orders');
 
 export const fetchOrderDetails = (user_id) =>
@@ -88,5 +85,30 @@ export const fetchUserById = (user_id) => api.get(`/users/${user_id}`);
 
 // ------------------- PAYMENTS -------------------
 export const initiatePayment = (paymentData) => api.post('/payments/initiate', paymentData);
+
+// ------------------- ADMIN -------------------
+// New function to fetch admin overview data
+export const fetchAdminOverview = async () => {
+  try {
+    // Assuming the backend route is now /api/admin/overview
+    const response = await api.get('/admin/overview');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch admin overview:', error.response || error);
+    throw error;
+  }
+};
+
+// New function to fetch admin revenue data
+export const fetchAdminRevenue = async () => {
+  try {
+    // Assuming the backend route is now /api/admin/revenue
+    const response = await api.get('/admin/revenue');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch admin revenue:', error.response || error);
+    throw error;
+  }
+};
 
 export default api;

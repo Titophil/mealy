@@ -7,5 +7,7 @@ services:
     envVars:
       - key: SECRET_KEY
         value: 8N3F2FmsdGnT7E0QrW-Jd9S8Sy3Q3mZ04RtTYgVwF6z3lzOiNH3CKTUKFeNdqFPO
+        key: DATABASE_URL
+        value: postgresql://mealy_ej97_user:XaB0YXVdSyBpElxsYFS1fzLJRh5HM7SL@dpg-d294uajuibrs73e7d6m0-a/mealy_ej97
     region: oregon
     plan: free

@@ -22,7 +22,7 @@ const SignupPage = () => {
       const userRole = response.data.user.role;
       const isAdmin = userRole === 'admin';
       
-      navigate(isAdmin ? '/admin' : '/dashboard', {
+      navigate(isAdmin ? '/admin' : '/userDashboard', {
         state: { message: 'Signup successful! Welcome!' },
       });
     } catch (error) {

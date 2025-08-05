@@ -20,7 +20,7 @@ const LoginPage = () => {
       const response = await login(formData.email, formData.password);
       // This logic is correct - it uses the role from the server response
       const isAdmin = response.data.user.role === 'admin';
-      navigate(isAdmin ? '/adminDashboard' : '/userDashboard');
+      navigate(isAdmin ? '/admindashboard' : '/userDashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
       console.error('Login error:', err.response?.data || err.message);

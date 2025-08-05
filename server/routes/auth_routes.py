@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
 def signup():
     if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /api/auth/signup")
+        logger.debug("Handling OPTIONS request for /auth/signup")
         response = make_response()
         response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
@@ -82,7 +82,7 @@ def signup():
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
     if request.method == 'OPTIONS':
-        logger.debug("Handling OPTIONS request for /api/auth/login")
+        logger.debug("Handling OPTIONS request for /auth/login")
         response = make_response()
         response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
@@ -118,9 +118,10 @@ def login():
             'access_token': access_token,
             'user': {
                 'id': user.id,
-                'email': user.email,
                 'name': user.name,
+                'email': user.email,# Note: Avoid sending password in response
                 'role': user.role
+              
             }
         }), 200
 

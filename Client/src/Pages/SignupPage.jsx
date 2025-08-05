@@ -17,7 +17,9 @@ const SignupPage = () => {
     try {
       await signup(data);
       const isAdmin = data.email.endsWith('@admin.gmail.com');
-      navigate(isAdmin ? '/admin' : '/meals');
+      navigate(isAdmin ? '/admin' : '/dashboard', {
+        state: { message: 'Signup successful! Welcome!' },
+      });
     } catch (error) {
       const errMsg =
         error.response?.data?.error ||

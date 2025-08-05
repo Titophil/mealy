@@ -41,13 +41,10 @@ def create_app():
     migrate = Migrate(app, db)
     jwt.init_app(app)
 
+    # UPDATED: Use a wildcard '*' to allow all origins
     CORS(app, resources={
         r"/*": {
-            "origins": [
-                "https://mealy-8-1cv8.onrender.com",
-                "https://sweet-tuzt.onrender.com",
-                "http://localhost:5173"
-            ],
+            "origins": "*",
             "supports_credentials": True,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]

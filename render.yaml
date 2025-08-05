@@ -3,13 +3,14 @@ services:
     name: flask-server
     runtime: python
     buildCommand: "poetry install"
-    # UPDATED: Added 'flask db upgrade &&' to run migrations before starting the Gunicorn server
     startCommand: "bash -c 'poetry run flask db upgrade && poetry run gunicorn server.app:app'"
     envVars:
       - key: SECRET_KEY
         value: 8N3F2FmsdGnT7E0QrW-Jd9S8Sy3Q3mZ04RtTYgVwF6z3lzOiNH3CKTUKFeNdqFPO
-      # ADDED: DATABASE_URL as a separate environment variable
       - key: DATABASE_URL
         value: postgresql://mealy_ej97_user:XaB0YXVdSyBpElxsYFS1fzLJRh5HM7SL@dpg-d294uajuibrs73e7d6m0-a/mealy_ej97
+      # ADDED: FLASK_APP environment variable
+      - key: FLASK_APP
+        value: server.app
     region: oregon
     plan: free

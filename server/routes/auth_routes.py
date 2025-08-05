@@ -15,7 +15,7 @@ def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/signup")
         response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = 'https://sweet-tuzt.onrender.com'
+        response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
         return response, 200
@@ -84,7 +84,7 @@ def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /api/auth/login")
         response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = 'https://sweet-tuzt.onrender.com'
+        response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
         return response, 200

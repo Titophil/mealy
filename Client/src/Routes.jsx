@@ -27,6 +27,7 @@ import OrderHistory from "./Pages/OrderHistory.jsx";
 // Shared
 import PrivateRoute from "./auth/PrivateRoute.jsx";
 import NotFound from "./Components/NotFound";
+import AdminDashboard from "./Components/AdminDashboard.jsx";
 
 const AppRoutes = () => {
   return (
@@ -48,8 +49,8 @@ const AppRoutes = () => {
 
  
       <Route element={<PrivateRoute requiredRole="admin" />}>
-        <Route path="/overview" element={<Admin />}>
-          <Route index element={<Overview />} /> 
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<AdminDashboard />} /> 
           <Route path="overview" element={<Overview />} /> 
           <Route path="orders" element={<OrdersCard />} /> 
           <Route path="meals" element={<Meals />} /> 

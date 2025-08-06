@@ -5,7 +5,7 @@ from server.extensions import db, bcrypt
 from flask_jwt_extended import create_access_token
 import logging
 
-auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
+auth_bp = Blueprint('auth_bp', __name__)
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -15,6 +15,7 @@ def signup():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /auth/signup")
         response = make_response()
+
         response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -40,16 +41,14 @@ def signup():
             return jsonify({'error': 'Email already exists'}), 400
 
         role = 'admin' if email.endswith('@admin.gmail.com') else 'user'
-        
+
         user = User(email=email, name=name, role=role)
-        # CORRECTED: Pass the plain-text password to the setter to handle hashing
-        user.password = password
-        
+        user.password = password 
+
         db.session.add(user)
         db.session.flush()
 
         if role == 'admin':
-            # Assuming the Caterer model stores the password hash directly
             caterer = Caterer(id=user.id, name=user.name, email=user.email, phone=phone or '', password=user.password_hash)
             db.session.add(caterer)
 
@@ -75,6 +74,7 @@ def login():
     if request.method == 'OPTIONS':
         logger.debug("Handling OPTIONS request for /auth/login")
         response = make_response()
+
         response.headers['Access-Control-Allow-Origin'] = 'https://mealy-12-fnkh.onrender.com'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
@@ -91,8 +91,7 @@ def login():
             return jsonify({'error': 'Email and password are required'}), 400
 
         user = User.query.filter_by(email=email).first()
-        
-        # CORRECTED: Use the model's authenticate() method for a clean and secure check
+
         if not user or not user.authenticate(password):
             logger.warning(f"Invalid login attempt for email: {email}")
             return jsonify({'error': 'Invalid email or password'}), 401

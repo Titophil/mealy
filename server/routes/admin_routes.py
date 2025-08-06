@@ -6,7 +6,7 @@ from datetime import date, datetime
 from sqlalchemy import func
 import logging
 
-# Configure logging for this blueprint
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def get_total_revenue():
         logger.debug(f"Fetching total revenue for caterer_id: {caterer_id}")
         today = date.today()
 
-        # CORRECTED: Multiply MealOption.price by Order.quantity for accurate revenue
+
         total_revenue = db.session.query(
             func.sum(MealOption.price * Order.quantity)
         ).join(Order, Order.meal_option_id == MealOption.id
@@ -159,7 +159,6 @@ def simulate_payment():
             logger.warning("Missing phone number or amount for simulate_payment.")
             return jsonify({"error": "Phone number and amount required"}), 400
 
-        # Assuming you have an stk_push_service module
         from server.services.daraja import initiate_stk_push
         response = initiate_stk_push(phone, amount)
         logger.info(f"STK Push initiated: {response}")
@@ -169,7 +168,7 @@ def simulate_payment():
         return jsonify({"error": str(e)}), 500
 
 
-# CORRECTED: Changed '/admin/overview' to '/overview' to avoid URL duplication
+
 @admin_bp.route('/overview', methods=['GET'])
 @jwt_required()
 def admin_overview():
@@ -182,7 +181,7 @@ def admin_overview():
         logger.debug(f"Fetching admin overview for caterer_id: {caterer_id}")
         today = datetime.now().date()
 
-        # Filter by caterer_id for accuracy
+   
         pending_orders = Order.query.filter_by(status='Pending', caterer_id=caterer_id).count()
 
         delivered_today_orders = Order.query.filter(
@@ -191,12 +190,10 @@ def admin_overview():
             Order.caterer_id == caterer_id
         ).all()
 
-        # Calculate revenue from delivered orders, ensuring menu_item is available
         revenue = sum(order.menu_item.price * order.quantity for order in delivered_today_orders if order.menu_item)
 
-        # Assuming Menu items are linked to caterers or are global
-        # If Menu items are per caterer, filter by caterer_id here too
-        available_meals = Menu.query.filter_by(is_deleted=False).count() # Or filter(Menu.caterer_id == caterer_id).count()
+
+        available_meals = Menu.query.filter_by(is_deleted=False).count() 
 
         return jsonify({
             'pending_orders': pending_orders,

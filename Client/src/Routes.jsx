@@ -48,7 +48,7 @@ const AppRoutes = () => {
 
  
       <Route element={<PrivateRoute requiredRole="admin" />}>
-        <Route path="/admin" element={<Admin />}>
+        <Route path="/admindashboard" element={<Admin />}>
           <Route index element={<Overview />} /> 
           <Route path="overview" element={<Overview />} /> 
           <Route path="orders" element={<OrdersCard />} /> 

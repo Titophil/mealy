@@ -20,7 +20,7 @@ const LoginPage = () => {
       const response = await login(formData.email, formData.password);
       const isAdmin = response.data.user.role === 'admin';
    
-      navigate(isAdmin ? '/admin' : '/userdashboard');
+      navigate(isAdmin ? '/admindashboard' : '/userdashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
       console.error('Login error:', err.response?.data || err.message);

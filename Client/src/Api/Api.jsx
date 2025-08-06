@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { getToken } from '../auth/authUtils';
 
-// Use environment variable for production, fallback for development
+
 const API_BASE_URL = 'https://mealy-8-1cv8.onrender.com/api';
-// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,14 +12,13 @@ const api = axios.create({
   },
 });
 
-// Attach token to all outgoing requests
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // No warning needed if token is not present for public routes like login/signup
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -87,7 +86,7 @@ export const fetchUserById = (user_id) => api.get(`/users/${user_id}`);
 export const initiatePayment = (paymentData) => api.post('/payments/initiate', paymentData);
 
 // ------------------- ADMIN -------------------
-// New function to fetch admin overview data
+
 export const fetchAdminOverview = async () => {
   try {
     // Assuming the backend route is now /api/admin/overview

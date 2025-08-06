@@ -7,14 +7,15 @@ import logging
 from logging.handlers import RotatingFileHandler
 from .config import Config
 from .extensions import db, jwt
+
 from .routes.admin_routes import admin_bp
 from .routes.payment_routes import payment_bp
 from .routes.auth_routes import auth_bp
 from .routes.user_routes import user_bp
-from .routes.Menu import menu_bp
+from .routes.Menu import menu_bp 
 from .routes.order_routes import order_bp
 from .routes.meal_routes import meal_bp
-from .commands import seed
+from .commands import seed 
 
 load_dotenv()
 
@@ -50,7 +51,6 @@ def create_app():
         }
     })
 
-    # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
@@ -86,6 +86,7 @@ def create_app():
         return jsonify({"error": "Internal server error"}), 500
 
     return app
+
 
 app = create_app()
 

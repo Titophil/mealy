@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({baseURL:'https://mealy-17.onrender.com'});
+const API = axios.create({baseURL:'https://mealy-8-1cv8.onrender.com/api'});
 
 
 export const getMenuByDate = (date) =>API.get(`/menus/${date}`);

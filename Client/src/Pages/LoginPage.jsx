@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthContext'; 
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -18,9 +18,9 @@ const LoginPage = () => {
     setError('');
     try {
       const response = await login(formData.email, formData.password);
-      // This logic is correct - it uses the role from the server response
       const isAdmin = response.data.user.role === 'admin';
-      navigate(isAdmin ? '/overview' : '/userDashboard');
+   
+      navigate(isAdmin ? '/admin/overview' : '/userdashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
       console.error('Login error:', err.response?.data || err.message);

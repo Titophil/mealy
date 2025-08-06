@@ -36,7 +36,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* Protected User Routes */}
+      {/* Protected User Routes (already using PrivateRoute) */}
       <Route element={<PrivateRoute />}>
         <Route path="/userdashboard" element={<UserDashboard />} />
         <Route path="/user/orders" element={<OrderHistory />} />
@@ -46,18 +46,19 @@ const AppRoutes = () => {
         <Route path="/order" element={<OrderForm />} />
       </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<Admin />}>
-        <Route index element={<Overview />} />
-        <Route path="overview" element={<Overview />} />
-        <Route path="orders" element={<OrdersCard />} />
-        <Route path="meals" element={<Meals />} />
-        <Route path="meals/add" element={<MealForm />} />
-        <Route path="menu-viewer" element={<Menuviewer />} />
-        <Route path="revenue" element={<Revenue />} />
+ 
+      <Route element={<PrivateRoute requiredRole="admin" />}>
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<Overview />} /> 
+          <Route path="overview" element={<Overview />} /> 
+          <Route path="orders" element={<OrdersCard />} /> 
+          <Route path="meals" element={<Meals />} /> 
+          <Route path="meals/add" element={<MealForm />} /> 
+          <Route path="menu-viewer" element={<Menuviewer />} /> 
+          <Route path="revenue" element={<Revenue />} /> 
+        </Route>
       </Route>
 
-      {/* Catch-all */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
